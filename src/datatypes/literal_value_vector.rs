@@ -1,10 +1,11 @@
 use crate::datatypes::column_vector::ColumnVector;
 use std::any::Any;
+use std::sync::Arc;
 
 struct LiteralValueVector {
     arrow_type: arrow::datatypes::DataType,
-    value: Option<Box<dyn Any>>,
-    size: u64,
+    value: Option<Arc<dyn Any>>,
+    size: usize,
 }
 
 impl ColumnVector for LiteralValueVector {
@@ -12,14 +13,14 @@ impl ColumnVector for LiteralValueVector {
         self.arrow_type.clone()
     }
 
-    fn get_value(&self, i: u64) -> Option<&Box<dyn Any>> {
+    fn get_value(&self, i: usize) -> Option<Arc<dyn Any>> {
         match i > self.size {
             true => None,
-            false => self.value.as_ref(),
+            false => self.value.clone(),
         }
     }
 
-    fn size(&self) -> u64 {
+    fn size(&self) -> usize {
         return self.size;
     }
 }

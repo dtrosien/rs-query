@@ -1,7 +1,9 @@
+use arrow::datatypes::DataType;
 use std::any::Any;
+use std::sync::Arc;
 
 pub trait ColumnVector {
-    fn get_type(&self) -> arrow::datatypes::DataType;
-    fn get_value(&self, i: u64) -> Option<&Box<dyn Any>>;
-    fn size(&self) -> u64;
+    fn get_type(&self) -> DataType;
+    fn get_value(&self, i: usize) -> Option<Arc<dyn Any>>;
+    fn size(&self) -> usize;
 }

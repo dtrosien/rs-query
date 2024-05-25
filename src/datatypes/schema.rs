@@ -1,8 +1,8 @@
 use arrow::datatypes::{DataType, Field as ArrowField, Schema as ArrowSchema};
 use std::collections::HashMap;
 
-struct Schema {
-    fields: Vec<Field>,
+pub struct Schema {
+    pub fields: Vec<Field>,
 }
 
 impl Schema {
@@ -50,7 +50,7 @@ impl Schema {
 
 #[derive(Clone)]
 struct Field {
-    name: String,
+    pub name: String,
     data_type: DataType,
 }
 
