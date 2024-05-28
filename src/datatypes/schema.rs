@@ -60,3 +60,32 @@ impl Field {
         ArrowField::new(&self.name, self.data_type.clone(), true)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::datatypes::schema::{Field, Schema};
+    use arrow::datatypes::DataType;
+
+    #[test]
+    fn test_schema_conversions() {
+        let field1 = Field {
+            name: "test1".to_string(),
+            data_type: DataType::Utf8,
+        };
+        let field2 = Field {
+            name: "test2".to_string(),
+            data_type: DataType::Int64,
+        };
+        let schema = Schema {
+            fields: vec![field1, field2],
+        };
+
+        let arrow_schema = schema.to_arrow();
+        let first_arrow_field = arrow_schema.fields().first().unwrap();
+        let num_fields = arrow_schema.fields().len();
+
+        assert_eq!(first_arrow_field.name(), "test1");
+        assert_eq!(first_arrow_field.data_type(), &DataType::Utf8);
+        assert_eq!(num_fields, 2)
+    }
+}
