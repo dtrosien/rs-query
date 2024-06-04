@@ -4,9 +4,9 @@ use arrow::array::Array;
 use std::fmt::Display;
 use std::sync::Arc;
 
-struct RecordBatch {
-    schema: Schema,
-    fields: Vec<Arc<dyn ColumnVector>>,
+pub struct RecordBatch {
+    pub(crate) schema: Arc<Schema>,
+    pub(crate) fields: Vec<Arc<dyn ColumnVector>>,
 }
 
 impl RecordBatch {

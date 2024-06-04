@@ -123,7 +123,7 @@ mod test {
         let column_vector =
             create_test_i64_column_vector(vec![Box::new(12), Box::new(12), Box::new("12")]);
 
-        let size = column_vector.lock().unwrap().size();
+        let size = column_vector.size();
 
         assert_eq!(size, 3);
     }
@@ -132,7 +132,7 @@ mod test {
     fn test_get_value() {
         let column_vector = create_test_i64_column_vector(vec![Box::new(12), Box::new("77")]);
 
-        let binding = column_vector.lock().unwrap().get_value(1).unwrap();
+        let binding = column_vector.get_value(1).unwrap();
         let third_value = *binding.downcast_ref::<i64>().unwrap();
 
         assert_eq!(third_value, 77);
@@ -142,12 +142,12 @@ mod test {
     fn test_get_type() {
         let column_vector = create_test_i64_column_vector(vec![Box::new(12)]);
 
-        let data_type = column_vector.lock().unwrap().get_type();
+        let data_type = column_vector.get_type();
 
         assert!(&data_type.equals_datatype(&DataType::Int64))
     }
 
-    fn create_test_i64_column_vector(values: Vec<Box<dyn Any>>) -> Arc<Mutex<dyn ColumnVector>> {
+    fn create_test_i64_column_vector(values: Vec<Box<dyn Any>>) -> Arc<dyn ColumnVector> {
         let field_vector_builder = ArrowArrayFactory::create(DataType::Int64, values.len());
         let mut builder = ArrowVectorBuilder::new(field_vector_builder);
 

@@ -133,10 +133,10 @@ impl ArrowVectorBuilder {
     }
 
     // todo check if not better to just return ArrowFieldVector even if its handled different in kquery
-    pub fn build(mut self) -> Arc<Mutex<dyn ColumnVector>> {
-        Arc::new(Mutex::new(ArrowFieldVector(Arc::new(Mutex::new(
+    pub fn build(mut self) -> Arc<dyn ColumnVector> {
+        Arc::new(ArrowFieldVector(Arc::new(Mutex::new(
             self.arrow_array_builder.finish(),
-        )))))
+        ))))
     }
 }
 
@@ -156,7 +156,7 @@ mod test {
         builder.append(Some(Box::new("22")));
 
         let column_vector = builder.build();
-        let binding = column_vector.lock().unwrap().get_value(2).unwrap();
+        let binding = column_vector.get_value(2).unwrap();
         let third_value = *binding.downcast_ref::<i64>().unwrap();
 
         assert_eq!(third_value, 22);

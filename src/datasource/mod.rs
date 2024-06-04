@@ -1,11 +1,14 @@
+mod csv_data_source;
+pub mod in_memory_data_source;
+
+use crate::datatypes::record_batch::RecordBatch;
 use crate::datatypes::schema::Schema;
-use arrow::ipc::RecordBatch;
 use std::sync::Arc;
 
-trait DataSource<'a> {
+trait DataSource {
     /// Return the schema for the underlying data source
-    fn schema() -> Schema;
+    fn schema(&self) -> Arc<Schema>;
 
     /// Scan the data source, selecting the specified columns
-    fn scan(projection: Vec<String>) -> Vec<RecordBatch<'a>>;
+    fn scan(&self, projection: Vec<String>) -> impl Iterator<Item = RecordBatch>;
 }
