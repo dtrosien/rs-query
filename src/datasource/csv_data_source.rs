@@ -36,18 +36,10 @@ impl DataSource for CsvDataSource {
             Arc::from(self.schema.select(projection).expect("TODO: panic message"))
         };
 
-        // todo TRANSLATE
-        //    val settings = defaultSettings()
-        //     if (projection.isNotEmpty()) {
-        //       settings.selectFields(*projection.toTypedArray())
-        //     }
-        //     settings.isHeaderExtractionEnabled = hasHeaders
-        //     if (!hasHeaders) {
-        //       settings.setHeaders(*readSchema.fields.map { it.name }.toTypedArray())
-        //     }
+        // todo check if add header is really not necessary(sould not be since i select with index) (kquery line 78)
 
         let r = CsvReader {
-            file_schema: self.schema.clone(),
+            full_schema: self.schema.clone(),
             read_schema,
             batch_size: self.batch_size,
             reader,
@@ -114,7 +106,7 @@ impl CsvDataSource {
 }
 
 struct CsvReader {
-    file_schema: Arc<Schema>,
+    full_schema: Arc<Schema>,
     read_schema: Arc<Schema>,
     batch_size: usize,
     reader: Reader<File>,
@@ -126,7 +118,7 @@ impl IntoIterator for CsvReader {
 
     fn into_iter(self) -> Self::IntoIter {
         CsvReaderIterator {
-            file_schema: self.file_schema,
+            file_schema: self.full_schema,
             read_schema: self.read_schema,
             batch_size: self.batch_size,
             reader: self.reader.into_records(),
@@ -164,25 +156,36 @@ impl CsvReaderIterator {
     fn create_batch(&self, rows: Vec<StringRecord>) -> RecordBatch {
         let initial_capacity = rows.len();
 
-        let mut fields: Vec<ArrowVectorBuilder> = self
+        let mut field_builders: Vec<(usize, ArrowVectorBuilder)> = self
             .read_schema
             .fields
             .iter()
-            .map(|x| ArrowArrayFactory::create(x.data_type.clone(), initial_capacity))
-            .map(|s| ArrowVectorBuilder::new(s))
+            .map(|x| {
+                let pos = self // todo move position finding outside of iterator to just do it once
+                    .file_schema
+                    .fields
+                    .iter()
+                    .position(|s| s.name == x.name)
+                    .unwrap();
+                let array = ArrowArrayFactory::create(x.data_type.clone(), initial_capacity);
+                let builder = ArrowVectorBuilder::new(array);
+                (pos, builder)
+            })
             .collect();
 
         rows.iter().for_each(|row| {
-            for (index, field) in fields.iter_mut().enumerate() {
+            for (index, field) in field_builders.iter_mut() {
                 let value = row
-                    .get(index)
+                    .get(*index)
                     .map(|str_value| Box::new(str_value.to_string()) as Box<dyn Any>);
                 field.append(value)
             }
         });
 
-        let fields: Vec<Arc<dyn ColumnVector>> =
-            fields.into_iter().map(|field| field.build()).collect();
+        let fields: Vec<Arc<dyn ColumnVector>> = field_builders
+            .into_iter()
+            .map(|(_, field)| field.build())
+            .collect();
 
         RecordBatch {
             schema: self.read_schema.clone(),
