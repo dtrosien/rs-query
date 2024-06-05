@@ -52,7 +52,7 @@ impl Schema {
 #[derive(Clone)]
 pub struct Field {
     pub name: String,
-    pub data_type: DataType,
+    pub data_type: DataType, // todo use own arrow_type (like done in kquery)
 }
 
 impl Field {
