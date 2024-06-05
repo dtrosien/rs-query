@@ -10,6 +10,7 @@ use csv::{Reader, ReaderBuilder, StringRecord, Terminator};
 use std::any::Any;
 use std::fs::File;
 use std::sync::Arc;
+use tracing::info;
 
 pub struct CsvDataSource {
     pub file_name: String,
@@ -23,13 +24,31 @@ impl DataSource for CsvDataSource {
         self.schema.clone()
     }
 
-    fn scan(&self, projection: Vec<String>) -> impl Iterator<Item = RecordBatch> {
-        // todo finish the scan method
+    fn scan(&self, projection: Vec<&str>) -> impl Iterator<Item = RecordBatch> {
+        info!("scan() projection={}", projection.concat());
+
         let file = Self::open_file(&self.file_name);
         let reader = Self::get_default_reader(self.has_headers, file);
 
+        let read_schema = if projection.is_empty() {
+            self.schema.clone()
+        } else {
+            Arc::from(self.schema.select(projection).expect("TODO: panic message"))
+        };
+
+        // todo TRANSLATE
+        //    val settings = defaultSettings()
+        //     if (projection.isNotEmpty()) {
+        //       settings.selectFields(*projection.toTypedArray())
+        //     }
+        //     settings.isHeaderExtractionEnabled = hasHeaders
+        //     if (!hasHeaders) {
+        //       settings.setHeaders(*readSchema.fields.map { it.name }.toTypedArray())
+        //     }
+
         let r = CsvReader {
-            schema: Arc::new(Schema { fields: vec![] }), // todo correct schema
+            file_schema: self.schema.clone(),
+            read_schema,
             batch_size: self.batch_size,
             reader,
         };
@@ -95,7 +114,8 @@ impl CsvDataSource {
 }
 
 struct CsvReader {
-    schema: Arc<Schema>,
+    file_schema: Arc<Schema>,
+    read_schema: Arc<Schema>,
     batch_size: usize,
     reader: Reader<File>,
 }
@@ -106,7 +126,8 @@ impl IntoIterator for CsvReader {
 
     fn into_iter(self) -> Self::IntoIter {
         CsvReaderIterator {
-            schema: self.schema,
+            file_schema: self.file_schema,
+            read_schema: self.read_schema,
             batch_size: self.batch_size,
             reader: self.reader.into_records(),
         }
@@ -114,7 +135,8 @@ impl IntoIterator for CsvReader {
 }
 
 struct CsvReaderIterator {
-    schema: Arc<Schema>,
+    file_schema: Arc<Schema>,
+    read_schema: Arc<Schema>,
     batch_size: usize,
     reader: csv::StringRecordsIntoIter<File>,
 }
@@ -143,7 +165,7 @@ impl CsvReaderIterator {
         let initial_capacity = rows.len();
 
         let mut fields: Vec<ArrowVectorBuilder> = self
-            .schema
+            .read_schema
             .fields
             .iter()
             .map(|x| ArrowArrayFactory::create(x.data_type.clone(), initial_capacity))
@@ -163,7 +185,7 @@ impl CsvReaderIterator {
             fields.into_iter().map(|field| field.build()).collect();
 
         RecordBatch {
-            schema: self.schema.clone(),
+            schema: self.read_schema.clone(),
             fields,
         }
     }

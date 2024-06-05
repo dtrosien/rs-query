@@ -8,7 +8,7 @@ pub struct Schema {
 
 impl Schema {
     // Convert from Arrow's Schema
-    fn from_arrow(arrow_schema: &ArrowSchema) -> Self {
+    pub fn from_arrow(arrow_schema: &ArrowSchema) -> Self {
         let fields: Vec<Field> = arrow_schema
             .fields()
             .iter()
@@ -21,13 +21,13 @@ impl Schema {
     }
 
     // Convert to Arrow's Schema
-    fn to_arrow(&self) -> ArrowSchema {
+    pub fn to_arrow(&self) -> ArrowSchema {
         let fields: Vec<_> = self.fields.iter().map(|f| f.to_arrow()).collect();
         ArrowSchema::new(fields)
     }
 
     // Project schema by field indices
-    fn project(&self, indices: Vec<usize>) -> Schema {
+    pub fn project(&self, indices: Vec<usize>) -> Schema {
         let fields = indices
             .into_iter()
             .map(|i| self.fields[i].clone())
@@ -36,7 +36,7 @@ impl Schema {
     }
 
     // Select schema by field names
-    fn select(&self, names: Vec<&str>) -> Result<Schema, &'static str> {
+    pub fn select(&self, names: Vec<&str>) -> Result<Schema, &'static str> {
         let mut fields = Vec::new();
         let name_set: HashMap<_, _> = self.fields.iter().map(|f| (&f.name as &str, f)).collect();
         for &name in names.iter() {

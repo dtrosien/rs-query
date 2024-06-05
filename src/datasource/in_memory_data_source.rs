@@ -13,7 +13,7 @@ impl DataSource for InMemoryDataSource {
         self.schema.clone()
     }
 
-    fn scan(&self, projection: Vec<String>) -> impl Iterator<Item = RecordBatch> {
+    fn scan(&self, projection: Vec<&str>) -> impl Iterator<Item = RecordBatch> {
         let projection_indices: Vec<usize> = projection
             .iter()
             .map(|name| {
