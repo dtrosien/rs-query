@@ -16,6 +16,7 @@ impl ArrowVectorBuilder {
         }
     }
 
+    // todo clean up repetitions etc
     pub fn append(&mut self, value: Option<Box<dyn Any>>) {
         if let Some(string_builder) = self
             .arrow_array_builder
