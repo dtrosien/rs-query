@@ -16,7 +16,7 @@ impl ArrowVectorBuilder {
         }
     }
 
-    pub(crate) fn append(&mut self, value: Option<Box<dyn Any>>) {
+    pub fn append(&mut self, value: Option<Box<dyn Any>>) {
         if let Some(string_builder) = self
             .arrow_array_builder
             .as_any_mut()
@@ -43,6 +43,8 @@ impl ArrowVectorBuilder {
                     int8_builder.append_value(*value);
                 } else if let Some(value) = value.downcast_ref::<&str>() {
                     int8_builder.append_value(value.parse().unwrap());
+                } else if let Some(value) = value.downcast_ref::<String>() {
+                    int8_builder.append_value(value.parse().unwrap());
                 } else {
                     int8_builder.append_null();
                 }
@@ -58,6 +60,8 @@ impl ArrowVectorBuilder {
                 if let Some(value) = value.downcast_ref::<i16>() {
                     int16_builder.append_value(*value);
                 } else if let Some(value) = value.downcast_ref::<&str>() {
+                    int16_builder.append_value(value.parse().unwrap());
+                } else if let Some(value) = value.downcast_ref::<String>() {
                     int16_builder.append_value(value.parse().unwrap());
                 } else {
                     int16_builder.append_null();
@@ -75,6 +79,8 @@ impl ArrowVectorBuilder {
                     int32_builder.append_value(*value);
                 } else if let Some(value) = value.downcast_ref::<&str>() {
                     int32_builder.append_value(value.parse().unwrap());
+                } else if let Some(value) = value.downcast_ref::<String>() {
+                    int32_builder.append_value(value.parse().unwrap());
                 } else {
                     int32_builder.append_null();
                 }
@@ -91,11 +97,85 @@ impl ArrowVectorBuilder {
                     int64_builder.append_value(*value);
                 } else if let Some(value) = value.downcast_ref::<&str>() {
                     int64_builder.append_value(value.parse().unwrap());
+                } else if let Some(value) = value.downcast_ref::<String>() {
+                    int64_builder.append_value(value.parse().unwrap());
                 } else {
                     int64_builder.append_null();
                 }
             } else {
                 int64_builder.append_null();
+            }
+        } else if let Some(uint8_builder) = self
+            .arrow_array_builder
+            .as_any_mut()
+            .downcast_mut::<UInt8Builder>()
+        {
+            if let Some(value) = value {
+                if let Some(value) = value.downcast_ref::<u8>() {
+                    uint8_builder.append_value(*value);
+                } else if let Some(value) = value.downcast_ref::<&str>() {
+                    uint8_builder.append_value(value.parse().unwrap());
+                } else if let Some(value) = value.downcast_ref::<String>() {
+                    uint8_builder.append_value(value.parse().unwrap());
+                } else {
+                    uint8_builder.append_null();
+                }
+            } else {
+                uint8_builder.append_null();
+            }
+        } else if let Some(uint16_builder) = self
+            .arrow_array_builder
+            .as_any_mut()
+            .downcast_mut::<UInt16Builder>()
+        {
+            if let Some(value) = value {
+                if let Some(value) = value.downcast_ref::<u16>() {
+                    uint16_builder.append_value(*value);
+                } else if let Some(value) = value.downcast_ref::<&str>() {
+                    uint16_builder.append_value(value.parse().unwrap());
+                } else if let Some(value) = value.downcast_ref::<String>() {
+                    uint16_builder.append_value(value.parse().unwrap());
+                } else {
+                    uint16_builder.append_null();
+                }
+            } else {
+                uint16_builder.append_null();
+            }
+        } else if let Some(uint32_builder) = self
+            .arrow_array_builder
+            .as_any_mut()
+            .downcast_mut::<UInt32Builder>()
+        {
+            if let Some(value) = value {
+                if let Some(value) = value.downcast_ref::<u32>() {
+                    uint32_builder.append_value(*value);
+                } else if let Some(value) = value.downcast_ref::<&str>() {
+                    uint32_builder.append_value(value.parse().unwrap());
+                } else if let Some(value) = value.downcast_ref::<String>() {
+                    uint32_builder.append_value(value.parse().unwrap());
+                } else {
+                    uint32_builder.append_null();
+                }
+            } else {
+                uint32_builder.append_null();
+            }
+        } else if let Some(uint64_builder) = self
+            .arrow_array_builder
+            .as_any_mut()
+            .downcast_mut::<UInt64Builder>()
+        {
+            if let Some(value) = value {
+                if let Some(value) = value.downcast_ref::<u64>() {
+                    uint64_builder.append_value(*value);
+                } else if let Some(value) = value.downcast_ref::<&str>() {
+                    uint64_builder.append_value(value.parse().unwrap());
+                } else if let Some(value) = value.downcast_ref::<String>() {
+                    uint64_builder.append_value(value.parse().unwrap());
+                } else {
+                    uint64_builder.append_null();
+                }
+            } else {
+                uint64_builder.append_null();
             }
         } else if let Some(float32_builder) = self
             .arrow_array_builder
@@ -106,6 +186,8 @@ impl ArrowVectorBuilder {
                 if let Some(value) = value.downcast_ref::<f32>() {
                     float32_builder.append_value(*value);
                 } else if let Some(value) = value.downcast_ref::<&str>() {
+                    float32_builder.append_value(value.parse().unwrap());
+                } else if let Some(value) = value.downcast_ref::<String>() {
                     float32_builder.append_value(value.parse().unwrap());
                 } else {
                     float32_builder.append_null();
@@ -123,12 +205,34 @@ impl ArrowVectorBuilder {
                     float64_builder.append_value(*value);
                 } else if let Some(value) = value.downcast_ref::<&str>() {
                     float64_builder.append_value(value.parse().unwrap());
+                } else if let Some(value) = value.downcast_ref::<String>() {
+                    float64_builder.append_value(value.parse().unwrap());
                 } else {
                     float64_builder.append_null();
                 }
             } else {
                 float64_builder.append_null();
             }
+        } else if let Some(bool_builder) = self
+            .arrow_array_builder
+            .as_any_mut()
+            .downcast_mut::<BooleanBuilder>()
+        {
+            if let Some(value) = value {
+                if let Some(value) = value.downcast_ref::<bool>() {
+                    bool_builder.append_value(*value);
+                } else if let Some(value) = value.downcast_ref::<&str>() {
+                    bool_builder.append_value(value.parse().unwrap());
+                } else if let Some(value) = value.downcast_ref::<String>() {
+                    bool_builder.append_value(value.parse().unwrap());
+                } else {
+                    bool_builder;
+                }
+            } else {
+                bool_builder.append_null();
+            }
+        } else {
+            panic!("unsupported type")
         }
     }
 
@@ -161,4 +265,5 @@ mod test {
 
         assert_eq!(third_value, 22);
     }
+    // todo test all builder types
 }

@@ -6,7 +6,7 @@ use crate::datatypes::record_batch::RecordBatch;
 use crate::datatypes::schema::{Field, Schema};
 use arrow::array::ArrayBuilder;
 use arrow::datatypes::DataType;
-use csv::{Reader, ReaderBuilder, StringRecord, Terminator};
+use csv::{Reader, ReaderBuilder, StringRecord, Terminator, Trim};
 use std::any::Any;
 use std::fs::File;
 use std::sync::Arc;
@@ -68,6 +68,7 @@ impl CsvDataSource {
             .has_headers(has_headers)
             .terminator(Terminator::CRLF)
             .delimiter(b',')
+            .trim(Trim::All)
             .from_reader(file)
     }
 
@@ -261,7 +262,7 @@ mod test {
     fn test_read_csv_with_provided_schema() {
         let field0 = Field {
             name: "id".to_string(),
-            data_type: DataType::Int64,
+            data_type: DataType::UInt16,
         };
         let field1 = Field {
             name: "first_name".to_string(),
@@ -295,7 +296,14 @@ mod test {
         assert_eq!(
             result.schema.fields.get(5).unwrap().data_type,
             DataType::Int64
-        )
+        );
+        let binding1 = result.fields.get(0).unwrap().get_value(1).unwrap();
+        let uint_val = binding1.downcast_ref::<u16>().unwrap();
+        let binding2 = result.fields.get(5).unwrap().get_value(0).unwrap();
+        let int_val = binding2.downcast_ref::<i64>().unwrap();
+
+        assert_eq!(*uint_val, 2);
+        assert_eq!(*int_val, 12000);
     }
 
     #[test]

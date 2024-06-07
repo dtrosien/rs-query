@@ -133,9 +133,9 @@ mod test {
         let column_vector = create_test_i64_column_vector(vec![Box::new(12), Box::new("77")]);
 
         let binding = column_vector.get_value(1).unwrap();
-        let third_value = *binding.downcast_ref::<i64>().unwrap();
+        let value = *binding.downcast_ref::<i64>().unwrap();
 
-        assert_eq!(third_value, 77);
+        assert_eq!(value, 77);
     }
 
     #[test]
