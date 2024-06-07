@@ -36,8 +36,6 @@ impl DataSource for CsvDataSource {
             Arc::from(self.schema.select(projection).expect("TODO: panic message"))
         };
 
-        // todo check if add header is really not necessary(sould not be since i select with index) (kquery line 78)
-
         let r = CsvReader {
             full_schema: self.schema.clone(),
             read_schema,
@@ -50,15 +48,15 @@ impl DataSource for CsvDataSource {
 
 impl CsvDataSource {
     pub fn new(
-        file_name: String,
+        file_name: &str,
         schema: Option<Arc<Schema>>,
         has_headers: bool,
         batch_size: usize,
     ) -> Self {
         let schema = schema
-            .unwrap_or_else(|| Arc::from(Self::infer_schema(has_headers, &file_name).unwrap()));
+            .unwrap_or_else(|| Arc::from(Self::infer_schema(has_headers, file_name).unwrap()));
         CsvDataSource {
-            file_name,
+            file_name: file_name.to_owned(),
             schema,
             has_headers,
             batch_size,
@@ -73,11 +71,11 @@ impl CsvDataSource {
             .from_reader(file)
     }
 
-    fn open_file(file_name: &String) -> File {
+    fn open_file(file_name: &str) -> File {
         File::open(file_name).expect(format!("file not found: {}", file_name).as_str())
     }
 
-    fn infer_schema(has_headers: bool, file_name: &String) -> anyhow::Result<Schema> {
+    fn infer_schema(has_headers: bool, file_name: &str) -> anyhow::Result<Schema> {
         let file = Self::open_file(file_name);
         let mut reader = Self::get_default_reader(has_headers, file);
 
@@ -138,12 +136,14 @@ impl Iterator for CsvReaderIterator {
 
     fn next(&mut self) -> Option<Self::Item> {
         let mut rows = Vec::with_capacity(self.batch_size);
-        for _ in 0..self.batch_size {
-            match self.reader.next() {
-                Some(Ok(record)) => rows.push(record),
-                _ => break,
-            }
-        }
+
+        rows.extend(
+            self.reader
+                .by_ref()
+                .take(self.batch_size)
+                .filter_map(Result::ok),
+        );
+
         if rows.is_empty() {
             None
         } else {
@@ -194,4 +194,116 @@ impl CsvReaderIterator {
     }
 }
 
-// todo tests
+#[cfg(test)]
+mod test {
+    use crate::datasource::csv_data_source::CsvDataSource;
+    use crate::datasource::DataSource;
+    use crate::datatypes::record_batch::RecordBatch;
+    use crate::datatypes::schema::{Field, Schema};
+    use arrow::datatypes::DataType;
+    use std::sync::Arc;
+
+    #[test]
+    fn test_read_csv_with_header() {
+        let ds = CsvDataSource::new("testdata/employee.csv", None, true, 1024);
+        let result = ds.scan(vec![]).next().unwrap();
+
+        assert_eq!(ds.schema.fields.len(), 6);
+        assert_eq!(ds.schema.fields.get(3).unwrap().name, "state");
+        assert_eq!(result.row_count(), 4);
+        assert_eq!(result.fields.len(), 6);
+    }
+
+    #[test]
+    fn test_read_csv_without_header() {
+        let ds = CsvDataSource::new("testdata/employee_no_header.csv", None, false, 1024);
+        let result = ds.scan(vec![]).next().unwrap();
+
+        assert_eq!(ds.schema.fields.len(), 6);
+        assert_eq!(ds.schema.fields.get(3).unwrap().name, "field_3");
+        assert_eq!(result.row_count(), 4);
+        assert_eq!(result.fields.len(), 6);
+    }
+
+    #[test]
+    fn test_read_csv_projection_with_header() {
+        let ds = CsvDataSource::new("testdata/employee.csv", None, true, 1024);
+        let projection = vec!["id", "state", "salary"];
+        let result = ds.scan(projection).next().unwrap();
+
+        // schema must not be touched by projection
+        assert_eq!(ds.schema.fields.len(), 6);
+        assert_eq!(ds.schema.fields.get(3).unwrap().name, "state");
+        assert_eq!(result.row_count(), 4);
+        assert_eq!(result.fields.len(), 3);
+        // actual read schema after projection
+        assert_eq!(result.schema.fields.len(), 3);
+        assert_eq!(result.schema.fields.get(1).unwrap().name, "state");
+    }
+
+    #[test]
+    fn test_read_csv_projection_without_header() {
+        let ds = CsvDataSource::new("testdata/employee_no_header.csv", None, false, 1024);
+        let projection = vec!["field_0", "field_3", "field_5"];
+        let result = ds.scan(projection).next().unwrap();
+
+        // schema must not be touched by projection
+        assert_eq!(ds.schema.fields.len(), 6);
+        assert_eq!(ds.schema.fields.get(3).unwrap().name, "field_3");
+        assert_eq!(result.row_count(), 4);
+        assert_eq!(result.fields.len(), 3);
+        // actual read schema after projection
+        assert_eq!(result.schema.fields.len(), 3);
+        assert_eq!(result.schema.fields.get(1).unwrap().name, "field_3");
+    }
+
+    #[test]
+    fn test_read_csv_with_provided_schema() {
+        let field0 = Field {
+            name: "id".to_string(),
+            data_type: DataType::Int64,
+        };
+        let field1 = Field {
+            name: "first_name".to_string(),
+            data_type: DataType::Utf8,
+        };
+        let field2 = Field {
+            name: "last_name".to_string(),
+            data_type: DataType::Utf8,
+        };
+        let field3 = Field {
+            name: "state".to_string(),
+            data_type: DataType::Utf8,
+        };
+        let field4 = Field {
+            name: "job_title".to_string(),
+            data_type: DataType::Utf8,
+        };
+        let field5 = Field {
+            name: "salary".to_string(),
+            data_type: DataType::Int64,
+        };
+        let fields = vec![field0, field1, field2, field3, field4, field5];
+        let schema = Schema { fields };
+        let ds = CsvDataSource::new("testdata/employee.csv", Some(Arc::from(schema)), true, 1024);
+        let result = ds.scan(vec![]).next().unwrap();
+
+        assert_eq!(ds.schema.fields.len(), 6);
+        assert_eq!(ds.schema.fields.get(3).unwrap().name, "state");
+        assert_eq!(result.row_count(), 4);
+        assert_eq!(result.fields.len(), 6);
+        assert_eq!(
+            result.schema.fields.get(5).unwrap().data_type,
+            DataType::Int64
+        )
+    }
+
+    #[test]
+    fn test_read_csv_with_small_batch_size() {
+        let ds = CsvDataSource::new("testdata/employee.csv", None, true, 1);
+        let batches: Vec<RecordBatch> = ds.scan(vec![]).collect();
+
+        assert_eq!(batches.len(), 4);
+        assert_eq!(batches.first().unwrap().row_count(), 1)
+    }
+}
