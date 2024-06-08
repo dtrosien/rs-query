@@ -1,3 +1,4 @@
+use crate::datatypes::arrow_types::ArrowTypes;
 use arrow::datatypes::{DataType, Field as ArrowField, Schema as ArrowSchema};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -16,7 +17,7 @@ impl Schema {
             .map(|f| {
                 Arc::new(Field {
                     name: f.name().clone(),
-                    data_type: f.data_type().clone(),
+                    data_type: ArrowTypes::from_datatype(f.data_type()),
                 })
             })
             .collect();
@@ -55,18 +56,19 @@ impl Schema {
 #[derive(Clone)]
 pub struct Field {
     pub name: String,
-    pub data_type: DataType, // todo use own arrow_type (like done in kquery)
+    pub data_type: ArrowTypes, // todo use own arrow_type (like done in kquery)
 }
 
 impl Field {
     // Convert to Arrow's Field
     fn to_arrow(&self) -> ArrowField {
-        ArrowField::new(&self.name, self.data_type.clone(), true)
+        ArrowField::new(&self.name, self.data_type.to_datatype(), true)
     }
 }
 
 #[cfg(test)]
 mod test {
+    use crate::datatypes::arrow_types::ArrowTypes;
     use crate::datatypes::schema::{Field, Schema};
     use arrow::datatypes::DataType;
     use std::sync::Arc;
@@ -75,11 +77,11 @@ mod test {
     fn test_schema_conversions() {
         let field1 = Arc::new(Field {
             name: "test1".to_string(),
-            data_type: DataType::Utf8,
+            data_type: ArrowTypes::StringType,
         });
         let field2 = Arc::new(Field {
             name: "test2".to_string(),
-            data_type: DataType::Int64,
+            data_type: ArrowTypes::Int64Type,
         });
         let schema = Schema {
             fields: vec![field1, field2],

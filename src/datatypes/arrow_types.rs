@@ -1,5 +1,6 @@
 use arrow::datatypes::DataType;
 
+#[derive(Clone, Debug, PartialEq)]
 pub enum ArrowTypes {
     BooleanType,
     Int8Type,

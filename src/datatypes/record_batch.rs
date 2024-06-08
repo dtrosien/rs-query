@@ -1,3 +1,4 @@
+use crate::datatypes::arrow_types::ArrowTypes;
 use crate::datatypes::column_vector::ColumnVector;
 use crate::datatypes::schema::Schema;
 use anyhow::anyhow;
@@ -38,44 +39,44 @@ impl RecordBatch {
                 let data_type = self.schema.fields.get(j)?.data_type.clone();
                 let any_value = self.field(j).get_value(i)?;
                 match data_type {
-                    DataType::Boolean => {
+                    ArrowTypes::BooleanType => {
                         row.push(any_value.downcast_ref::<bool>()?.to_string().to_owned());
                     }
-                    DataType::Int8 => {
+                    ArrowTypes::Int8Type => {
                         row.push(any_value.downcast_ref::<i8>()?.to_string().to_owned());
                     }
-                    DataType::Int16 => {
+                    ArrowTypes::Int16Type => {
                         row.push(any_value.downcast_ref::<i16>()?.to_string().to_owned());
                     }
-                    DataType::Int32 => {
+                    ArrowTypes::Int32Type => {
                         row.push(any_value.downcast_ref::<i32>()?.to_string().to_owned());
                     }
-                    DataType::Int64 => {
+                    ArrowTypes::Int64Type => {
                         row.push(any_value.downcast_ref::<i64>()?.to_string().to_owned());
                     }
-                    DataType::UInt8 => {
+                    ArrowTypes::UInt8Type => {
                         row.push(any_value.downcast_ref::<u8>()?.to_string().to_owned());
                     }
-                    DataType::UInt16 => {
+                    ArrowTypes::UInt16Type => {
                         row.push(any_value.downcast_ref::<u16>()?.to_string().to_owned());
                     }
-                    DataType::UInt32 => {
+                    ArrowTypes::UInt32Type => {
                         row.push(any_value.downcast_ref::<u32>()?.to_string().to_owned());
                     }
-                    DataType::UInt64 => {
+                    ArrowTypes::UInt64Type => {
                         row.push(any_value.downcast_ref::<u64>()?.to_string().to_owned());
                     }
-                    DataType::Float32 => {
+                    ArrowTypes::FloatType => {
                         row.push(any_value.downcast_ref::<f32>()?.to_string().to_owned());
                     }
-                    DataType::Float64 => {
+                    ArrowTypes::DoubleType => {
                         row.push(any_value.downcast_ref::<f64>()?.to_string().to_owned());
                     }
-                    DataType::Utf8 => {
+                    ArrowTypes::StringType => {
                         row.push(any_value.downcast_ref::<String>()?.to_owned());
                     }
                     _ => {
-                        anyhow!("type not supported: {}", data_type);
+                        anyhow!("type not supported: {:?}", data_type);
                     }
                 }
             }
