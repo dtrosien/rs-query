@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 #[derive(Clone)]
 pub struct Schema {
-    pub fields: Vec<Field>,
+    pub fields: Vec<Field>, // todo use Arc<Field>
 }
 
 impl Schema {
