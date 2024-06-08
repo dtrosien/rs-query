@@ -84,9 +84,11 @@ impl CsvDataSource {
         if has_headers {
             let fields = headers
                 .iter()
-                .map(|column_name| Field {
-                    name: column_name.to_string(),
-                    data_type: DataType::Utf8,
+                .map(|column_name| {
+                    Arc::new(Field {
+                        name: column_name.to_string(),
+                        data_type: DataType::Utf8,
+                    })
                 })
                 .collect();
             Ok(Schema { fields })
@@ -94,9 +96,11 @@ impl CsvDataSource {
             let fields = headers
                 .iter()
                 .enumerate()
-                .map(|(i, _)| Field {
-                    name: format!("field_{i}"),
-                    data_type: DataType::Utf8,
+                .map(|(i, _)| {
+                    Arc::new(Field {
+                        name: format!("field_{i}"),
+                        data_type: DataType::Utf8,
+                    })
                 })
                 .collect();
             Ok(Schema { fields })
@@ -284,7 +288,10 @@ mod test {
             name: "salary".to_string(),
             data_type: DataType::Int64,
         };
-        let fields = vec![field0, field1, field2, field3, field4, field5];
+        let fields = vec![field0, field1, field2, field3, field4, field5]
+            .into_iter()
+            .map(|f| Arc::new(f))
+            .collect();
         let schema = Schema { fields };
         let ds = CsvDataSource::new("testdata/employee.csv", Some(Arc::from(schema)), true, 1024);
         let result = ds.scan(vec![]).next().unwrap();

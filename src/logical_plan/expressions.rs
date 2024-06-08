@@ -22,15 +22,12 @@ impl Display for Column {
 
 impl LogicalExpr for Column {
     fn to_field(&self, input: Arc<dyn LogicalPlan>) -> Arc<Field> {
-        Arc::new(
-            // todo remove here when Arc<Field> is used in Schema
-            input
-                .schema()
-                .fields
-                .iter()
-                .find(|f| self.name == f.name)
-                .expect(format!("No column named {}", self.name).as_str())
-                .clone(),
-        )
+        input
+            .schema()
+            .fields
+            .iter()
+            .find(|f| self.name == f.name)
+            .expect(format!("No column named {}", self.name).as_str())
+            .clone()
     }
 }

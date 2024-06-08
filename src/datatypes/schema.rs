@@ -1,20 +1,23 @@
 use arrow::datatypes::{DataType, Field as ArrowField, Schema as ArrowSchema};
 use std::collections::HashMap;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct Schema {
-    pub fields: Vec<Field>, // todo use Arc<Field>
+    pub fields: Vec<Arc<Field>>, // todo used Arc<Field> instead of just Field ... check later if that is really better for most cases
 }
 
 impl Schema {
     // Convert from Arrow's Schema
     pub fn from_arrow(arrow_schema: &ArrowSchema) -> Self {
-        let fields: Vec<Field> = arrow_schema
+        let fields: Vec<Arc<Field>> = arrow_schema
             .fields()
             .iter()
-            .map(|f| Field {
-                name: f.name().clone(),
-                data_type: f.data_type().clone(),
+            .map(|f| {
+                Arc::new(Field {
+                    name: f.name().clone(),
+                    data_type: f.data_type().clone(),
+                })
             })
             .collect();
         Schema { fields }
@@ -66,17 +69,18 @@ impl Field {
 mod test {
     use crate::datatypes::schema::{Field, Schema};
     use arrow::datatypes::DataType;
+    use std::sync::Arc;
 
     #[test]
     fn test_schema_conversions() {
-        let field1 = Field {
+        let field1 = Arc::new(Field {
             name: "test1".to_string(),
             data_type: DataType::Utf8,
-        };
-        let field2 = Field {
+        });
+        let field2 = Arc::new(Field {
             name: "test2".to_string(),
             data_type: DataType::Int64,
-        };
+        });
         let schema = Schema {
             fields: vec![field1, field2],
         };
