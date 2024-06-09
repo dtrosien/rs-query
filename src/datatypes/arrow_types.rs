@@ -1,7 +1,7 @@
 use arrow::datatypes::DataType;
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum ArrowTypes {
+pub enum ArrowType {
     BooleanType,
     Int8Type,
     Int16Type,
@@ -16,38 +16,38 @@ pub enum ArrowTypes {
     StringType,
 }
 
-impl ArrowTypes {
+impl ArrowType {
     pub fn to_datatype(&self) -> DataType {
         match self {
-            ArrowTypes::BooleanType => DataType::Boolean,
-            ArrowTypes::Int8Type => DataType::Int8,
-            ArrowTypes::Int16Type => DataType::Int16,
-            ArrowTypes::Int32Type => DataType::Int32,
-            ArrowTypes::Int64Type => DataType::Int64,
-            ArrowTypes::UInt8Type => DataType::UInt8,
-            ArrowTypes::UInt16Type => DataType::UInt16,
-            ArrowTypes::UInt32Type => DataType::UInt32,
-            ArrowTypes::UInt64Type => DataType::UInt64,
-            ArrowTypes::FloatType => DataType::Float32,
-            ArrowTypes::DoubleType => DataType::Float64,
-            ArrowTypes::StringType => DataType::Utf8,
+            ArrowType::BooleanType => DataType::Boolean,
+            ArrowType::Int8Type => DataType::Int8,
+            ArrowType::Int16Type => DataType::Int16,
+            ArrowType::Int32Type => DataType::Int32,
+            ArrowType::Int64Type => DataType::Int64,
+            ArrowType::UInt8Type => DataType::UInt8,
+            ArrowType::UInt16Type => DataType::UInt16,
+            ArrowType::UInt32Type => DataType::UInt32,
+            ArrowType::UInt64Type => DataType::UInt64,
+            ArrowType::FloatType => DataType::Float32,
+            ArrowType::DoubleType => DataType::Float64,
+            ArrowType::StringType => DataType::Utf8,
         }
     }
 
     pub fn from_datatype(data_type: &DataType) -> Self {
         match data_type {
-            DataType::Boolean => ArrowTypes::BooleanType,
-            DataType::Int8 => ArrowTypes::Int8Type,
-            DataType::Int16 => ArrowTypes::Int16Type,
-            DataType::Int32 => ArrowTypes::Int32Type,
-            DataType::Int64 => ArrowTypes::Int64Type,
-            DataType::UInt8 => ArrowTypes::UInt8Type,
-            DataType::UInt16 => ArrowTypes::UInt16Type,
-            DataType::UInt32 => ArrowTypes::UInt32Type,
-            DataType::UInt64 => ArrowTypes::UInt64Type,
-            DataType::Float32 => ArrowTypes::FloatType,
-            DataType::Float64 => ArrowTypes::DoubleType,
-            DataType::Utf8 => ArrowTypes::StringType,
+            DataType::Boolean => ArrowType::BooleanType,
+            DataType::Int8 => ArrowType::Int8Type,
+            DataType::Int16 => ArrowType::Int16Type,
+            DataType::Int32 => ArrowType::Int32Type,
+            DataType::Int64 => ArrowType::Int64Type,
+            DataType::UInt8 => ArrowType::UInt8Type,
+            DataType::UInt16 => ArrowType::UInt16Type,
+            DataType::UInt32 => ArrowType::UInt32Type,
+            DataType::UInt64 => ArrowType::UInt64Type,
+            DataType::Float32 => ArrowType::FloatType,
+            DataType::Float64 => ArrowType::DoubleType,
+            DataType::Utf8 => ArrowType::StringType,
             _ => panic!("Unsupported data type"),
         }
     }

@@ -1,6 +1,6 @@
 use crate::datasource::DataSource;
 use crate::datatypes::arrow_field_vector::ArrowArrayFactory;
-use crate::datatypes::arrow_types::ArrowTypes;
+use crate::datatypes::arrow_types::ArrowType;
 use crate::datatypes::arrow_vector_builder::ArrowVectorBuilder;
 use crate::datatypes::column_vector::ColumnVector;
 use crate::datatypes::record_batch::RecordBatch;
@@ -88,7 +88,7 @@ impl CsvDataSource {
                 .map(|column_name| {
                     Arc::new(Field {
                         name: column_name.to_string(),
-                        data_type: ArrowTypes::StringType,
+                        data_type: ArrowType::StringType,
                     })
                 })
                 .collect();
@@ -100,7 +100,7 @@ impl CsvDataSource {
                 .map(|(i, _)| {
                     Arc::new(Field {
                         name: format!("field_{i}"),
-                        data_type: ArrowTypes::StringType,
+                        data_type: ArrowType::StringType,
                     })
                 })
                 .collect();
@@ -204,7 +204,7 @@ impl CsvReaderIterator {
 mod test {
     use crate::datasource::csv_data_source::CsvDataSource;
     use crate::datasource::DataSource;
-    use crate::datatypes::arrow_types::ArrowTypes;
+    use crate::datatypes::arrow_types::ArrowType;
     use crate::datatypes::record_batch::RecordBatch;
     use crate::datatypes::schema::{Field, Schema};
     use arrow::datatypes::DataType;
@@ -268,27 +268,27 @@ mod test {
     fn test_read_csv_with_provided_schema() {
         let field0 = Field {
             name: "id".to_string(),
-            data_type: ArrowTypes::UInt16Type,
+            data_type: ArrowType::UInt16Type,
         };
         let field1 = Field {
             name: "first_name".to_string(),
-            data_type: ArrowTypes::StringType,
+            data_type: ArrowType::StringType,
         };
         let field2 = Field {
             name: "last_name".to_string(),
-            data_type: ArrowTypes::StringType,
+            data_type: ArrowType::StringType,
         };
         let field3 = Field {
             name: "state".to_string(),
-            data_type: ArrowTypes::StringType,
+            data_type: ArrowType::StringType,
         };
         let field4 = Field {
             name: "job_title".to_string(),
-            data_type: ArrowTypes::StringType,
+            data_type: ArrowType::StringType,
         };
         let field5 = Field {
             name: "salary".to_string(),
-            data_type: ArrowTypes::Int64Type,
+            data_type: ArrowType::Int64Type,
         };
         let fields = vec![field0, field1, field2, field3, field4, field5]
             .into_iter()
@@ -304,7 +304,7 @@ mod test {
         assert_eq!(result.fields.len(), 6);
         assert_eq!(
             result.schema.fields.get(5).unwrap().data_type,
-            ArrowTypes::Int64Type
+            ArrowType::Int64Type
         );
         let binding1 = result.fields.get(0).unwrap().get_value(1).unwrap();
         let uint_val = binding1.downcast_ref::<u16>().unwrap();
