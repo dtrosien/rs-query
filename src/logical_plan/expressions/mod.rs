@@ -197,7 +197,7 @@ mod test {
     use std::sync::Arc;
 
     #[test]
-    fn display_expressions_test() {
+    fn test_display_expressions() {
         let lit1 = Arc::new(lit_long(5));
         let lit2 = Arc::new(lit_long(10));
 
@@ -227,7 +227,7 @@ mod test {
     }
 
     #[test]
-    fn chained_expression_test() {
+    fn test_chained_expression() {
         let col1 = Arc::new(col("COL_1"));
         let col2 = Arc::new(col("COL_2"));
 

@@ -203,44 +203,43 @@ impl CsvReaderIterator {
 #[cfg(test)]
 mod test {
     use crate::datasource::csv_data_source::CsvDataSource;
-    use crate::datasource::DataSource;
+    use crate::datasource::{DataSource, Source};
     use crate::datatypes::arrow_types::ArrowType;
     use crate::datatypes::record_batch::RecordBatch;
     use crate::datatypes::schema::{Field, Schema};
-    use arrow::datatypes::DataType;
     use std::sync::Arc;
 
     #[test]
     fn test_read_csv_with_header() {
-        let ds = CsvDataSource::new("testdata/employee.csv", None, true, 1024);
+        let ds = Source::from_csv("testdata/employee.csv", None, true, 1024);
         let result = ds.scan(vec![]).next().unwrap();
 
-        assert_eq!(ds.schema.fields.len(), 6);
-        assert_eq!(ds.schema.fields.get(3).unwrap().name, "state");
+        assert_eq!(ds.schema().fields.len(), 6);
+        assert_eq!(ds.schema().fields.get(3).unwrap().name, "state");
         assert_eq!(result.row_count(), 4);
         assert_eq!(result.fields.len(), 6);
     }
 
     #[test]
     fn test_read_csv_without_header() {
-        let ds = CsvDataSource::new("testdata/employee_no_header.csv", None, false, 1024);
+        let ds = Source::from_csv("testdata/employee_no_header.csv", None, false, 1024);
         let result = ds.scan(vec![]).next().unwrap();
 
-        assert_eq!(ds.schema.fields.len(), 6);
-        assert_eq!(ds.schema.fields.get(3).unwrap().name, "field_3");
+        assert_eq!(ds.schema().fields.len(), 6);
+        assert_eq!(ds.schema().fields.get(3).unwrap().name, "field_3");
         assert_eq!(result.row_count(), 4);
         assert_eq!(result.fields.len(), 6);
     }
 
     #[test]
     fn test_read_csv_projection_with_header() {
-        let ds = CsvDataSource::new("testdata/employee.csv", None, true, 1024);
+        let ds = Source::from_csv("testdata/employee.csv", None, true, 1024);
         let projection = vec!["id", "state", "salary"];
         let result = ds.scan(projection).next().unwrap();
 
         // schema must not be touched by projection
-        assert_eq!(ds.schema.fields.len(), 6);
-        assert_eq!(ds.schema.fields.get(3).unwrap().name, "state");
+        assert_eq!(ds.schema().fields.len(), 6);
+        assert_eq!(ds.schema().fields.get(3).unwrap().name, "state");
         assert_eq!(result.row_count(), 4);
         assert_eq!(result.fields.len(), 3);
         // actual read schema after projection
@@ -250,13 +249,13 @@ mod test {
 
     #[test]
     fn test_read_csv_projection_without_header() {
-        let ds = CsvDataSource::new("testdata/employee_no_header.csv", None, false, 1024);
+        let ds = Source::from_csv("testdata/employee_no_header.csv", None, false, 1024);
         let projection = vec!["field_0", "field_3", "field_5"];
         let result = ds.scan(projection).next().unwrap();
 
         // schema must not be touched by projection
-        assert_eq!(ds.schema.fields.len(), 6);
-        assert_eq!(ds.schema.fields.get(3).unwrap().name, "field_3");
+        assert_eq!(ds.schema().fields.len(), 6);
+        assert_eq!(ds.schema().fields.get(3).unwrap().name, "field_3");
         assert_eq!(result.row_count(), 4);
         assert_eq!(result.fields.len(), 3);
         // actual read schema after projection
@@ -295,11 +294,11 @@ mod test {
             .map(|f| Arc::new(f))
             .collect();
         let schema = Schema { fields };
-        let ds = CsvDataSource::new("testdata/employee.csv", Some(Arc::from(schema)), true, 1024);
+        let ds = Source::from_csv("testdata/employee.csv", Some(Arc::from(schema)), true, 1024);
         let result = ds.scan(vec![]).next().unwrap();
 
-        assert_eq!(ds.schema.fields.len(), 6);
-        assert_eq!(ds.schema.fields.get(3).unwrap().name, "state");
+        assert_eq!(ds.schema().fields.len(), 6);
+        assert_eq!(ds.schema().fields.get(3).unwrap().name, "state");
         assert_eq!(result.row_count(), 4);
         assert_eq!(result.fields.len(), 6);
         assert_eq!(
@@ -318,7 +317,8 @@ mod test {
 
     #[test]
     fn test_read_csv_with_small_batch_size() {
-        let ds = CsvDataSource::new("testdata/employee.csv", None, true, 1);
+        let ds = Source::from_csv("testdata/employee.csv", None, true, 1);
+
         let batches: Vec<RecordBatch> = ds.scan(vec![]).collect();
 
         assert_eq!(batches.len(), 4);

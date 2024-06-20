@@ -8,6 +8,12 @@ pub struct InMemoryDataSource {
     pub data: Vec<RecordBatch>,
 }
 
+impl InMemoryDataSource {
+    pub fn new(schema: Arc<Schema>, data: Vec<RecordBatch>) -> Self {
+        InMemoryDataSource { schema, data }
+    }
+}
+
 impl DataSource for InMemoryDataSource {
     fn schema(&self) -> Arc<Schema> {
         self.schema.clone()
