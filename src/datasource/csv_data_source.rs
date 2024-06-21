@@ -312,7 +312,7 @@ mod test {
 
         assert_eq!(*uint_val, 2);
         assert_eq!(*int_val, 12000);
-        println!("{result}")
+        //println!("{result}")
     }
 
     #[test]

@@ -1,8 +1,8 @@
-mod aggr_expr;
-mod binary_expr;
-mod literal_expr;
-mod math_expr;
-mod unary_expr;
+pub mod aggr_expr;
+pub mod binary_expr;
+pub mod literal_expr;
+pub mod math_expr;
+pub mod unary_expr;
 
 use crate::datatypes::schema::Field;
 use std::fmt;

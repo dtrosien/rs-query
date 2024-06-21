@@ -76,6 +76,7 @@ pub struct Max {
 
 /// Convenience method to create a max reference
 pub fn max(expr: Arc<Expr>) -> Arc<Expr> {
+    // todo how can i return here AggrExpr and still manage to concat it with Expr (see also Aggregate LogicalPlan)
     Arc::from(Expr::Aggr(AggrExpr::Max(Max::new(expr))))
 }
 

@@ -4,7 +4,8 @@ use crate::logical_plan::LogicalPlan;
 use std::fmt::Display;
 use std::sync::Arc;
 
-struct Scan {
+/// Represents a scan of a data source
+pub struct Scan {
     path: String,
     datasource: Arc<Source>,
     projection: Vec<String>,
@@ -58,8 +59,17 @@ impl LogicalPlan for Scan {
 
 #[cfg(test)]
 mod test {
+    use crate::datasource::Source;
+    use crate::logical_plan::format;
+    use crate::logical_plan::scan::Scan;
+    use std::sync::Arc;
+
     #[test]
-    fn test_scan() {
-        todo!()
+    fn test_logical_scan() {
+        let csv = Arc::from(Source::from_csv("testdata/employee.csv", None, true, 1024));
+        let scan = Arc::from(Scan::new("employee".to_string(), csv, vec![]));
+        let plan_string = format(scan, 0);
+        assert_eq!("Scan: employee; projection=None\n", plan_string);
+        //println!("{plan_string}")
     }
 }
