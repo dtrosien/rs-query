@@ -79,8 +79,7 @@ mod test {
     use crate::logical_plan::expressions::math_expr::MathExprExt;
     use crate::logical_plan::expressions::{alias, col};
     use crate::logical_plan::scan::Scan;
-    use crate::logical_plan::{format, LogicalPlan};
-    use std::sync::Arc;
+    use crate::logical_plan::PlanPrinter;
 
     #[test]
     fn test_build_data_frame() {
@@ -89,14 +88,12 @@ mod test {
             .project(vec![col("id"), col("first_name"), col("last_name")])
             .logical_plan();
 
-        let plan_string = format(df, 0);
-
-        //println!("{plan_string}");
+        //println!("{df.pretty()}");
         assert_eq!(
             "Projection: id, first_name, last_name\n\
         \tSelection: state = CO\n\
         \t\tScan: employee; projection=None\n",
-            plan_string
+            df.pretty()
         );
     }
 
@@ -114,14 +111,12 @@ mod test {
             .filter(col("bonus").gt(lit_long(1000)))
             .logical_plan();
 
-        let plan_string = format(df, 0);
-        //println!("{plan_string}");
         assert_eq!(
             "Selection: bonus > 1000\n\
      \tProjection: id, first_name, last_name, salary, salary * 0.1 AS bonus\n\
      \t\tSelection: state = CO\n\
      \t\t\tScan: employee; projection=None\n",
-            plan_string
+            df.pretty()
         );
     }
 
@@ -134,12 +129,10 @@ mod test {
             )
             .logical_plan();
 
-        let plan_string = format(df, 0);
-        //println!("{plan_string}");
         assert_eq!(
             "Aggregate: group_expr=state, aggregate_expr=MIN(salary), MAX(salary), COUNT(salary)\n\
             \tScan: employee; projection=None\n",
-            plan_string
+            df.pretty()
         );
     }
 

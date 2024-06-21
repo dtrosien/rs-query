@@ -13,16 +13,21 @@ use std::sync::Arc;
 trait LogicalPlan: ToString {
     fn schema(&self) -> Arc<Schema>;
     fn children(&self) -> Vec<Arc<dyn LogicalPlan>>;
+}
 
-    fn pretty(self: Arc<Self>) -> String
-    // todo does not compile when used on trait object -> fix
-    where
-        Self: Sized + 'static,
-    {
+/// trait to pretty print LogicalPlan
+/// outside logical plan because otherwise it does not work with ?Sized
+pub trait PlanPrinter {
+    fn pretty(&self) -> String;
+}
+/// pretty prints LogicalPlan objects
+impl PlanPrinter for Arc<dyn LogicalPlan> {
+    fn pretty(&self) -> String {
         format(self.clone(), 0)
     }
 }
 
+/// Format a logical plan in human-readable form
 fn format(plan: Arc<dyn LogicalPlan>, indent: usize) -> String {
     let mut b = String::new();
     for _ in 0..indent {
