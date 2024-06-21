@@ -165,6 +165,14 @@ pub struct Alias {
     alias: String,
 }
 
+/// Convenience method to create a Alias
+pub fn alias(expr: Arc<Expr>, alias: impl Into<String>) -> Arc<Expr> {
+    Arc::from(Expr::Alias(Alias {
+        expr,
+        alias: alias.into(),
+    }))
+}
+
 impl Alias {
     pub(crate) fn new(expr: Arc<Expr>, alias: String) -> Self {
         Self { expr, alias }

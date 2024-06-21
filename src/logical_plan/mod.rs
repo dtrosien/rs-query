@@ -1,10 +1,11 @@
-mod aggregate;
+pub mod aggregate;
+mod data_frame;
 pub mod expressions;
-mod limit;
+pub mod limit;
 pub mod logical_expr;
-mod projection;
+pub mod projection;
 pub mod scan;
-mod selection;
+pub mod selection;
 
 use crate::datatypes::schema::Schema;
 use std::sync::Arc;
@@ -14,6 +15,7 @@ trait LogicalPlan: ToString {
     fn children(&self) -> Vec<Arc<dyn LogicalPlan>>;
 
     fn pretty(self: Arc<Self>) -> String
+    // todo does not compile when used on trait object -> fix
     where
         Self: Sized + 'static,
     {
