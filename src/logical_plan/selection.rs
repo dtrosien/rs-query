@@ -31,7 +31,6 @@ impl LogicalPlan for Selection {
     }
 }
 
-// think about whether to use macro or new()-> Arc<Self>
 #[macro_export]
 macro_rules! selection {
     ($input:expr, $expr:expr) => {
