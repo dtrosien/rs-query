@@ -17,12 +17,12 @@ impl Aggregate {
         input: Arc<dyn LogicalPlan>,
         group_expr: Vec<Arc<Expr>>,
         aggregate_expr: Vec<Arc<Expr>>,
-    ) -> Self {
-        Aggregate {
+    ) -> Arc<Self> {
+        Arc::new(Aggregate {
             input,
             group_expr,
             aggregate_expr,
-        }
+        })
     }
 }
 
@@ -80,16 +80,15 @@ mod test {
     use crate::logical_plan::expressions::{cast, col};
     use crate::logical_plan::format;
     use crate::logical_plan::scan::Scan;
-    use std::sync::Arc;
 
     #[test]
     fn test_logical_selection() {
         let csv = Source::from_csv("testdata/employee.csv", None, true, 1024);
-        let scan = Arc::from(Scan::new("employee".to_string(), csv, vec![]));
+        let scan = Scan::new("employee".to_string(), csv, vec![]);
 
         let group_expr = vec![col("state")];
         let aggr_expr = vec![max(cast(col("salary"), ArrowType::Int32Type))];
-        let aggregate = Arc::from(Aggregate::new(scan, group_expr, aggr_expr));
+        let aggregate = Aggregate::new(scan, group_expr, aggr_expr);
 
         let plan_string = format(aggregate, 0);
         assert_eq!(

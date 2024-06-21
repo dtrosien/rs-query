@@ -44,22 +44,21 @@ mod test {
     use crate::logical_plan::projection::Projection;
     use crate::logical_plan::scan::Scan;
     use crate::logical_plan::selection::Selection;
-    use std::sync::Arc;
 
     #[test]
     fn test_build_logical_plan() {
         // create a plan to represent the data source
         let csv = Source::from_csv("testdata/employee.csv", None, true, 1024);
         // create a plan to represent the scan of the data source (FROM)
-        let scan = Arc::from(Scan::new("employee".to_string(), csv, vec![]));
+        let scan = Scan::new("employee".to_string(), csv, vec![]);
         // create a plan to represent the selection (WHERE)
         let filter_expr = col("state").eq(lit_str("CO"));
-        let selection = Arc::from(Selection::new(scan, filter_expr));
+        let selection = Selection::new(scan, filter_expr);
         // create a plan to represent the projection (SELECT)
-        let plan = Arc::from(Projection::new(
+        let plan = Projection::new(
             selection,
             vec![col("id"), col("first_name"), col("last_name")],
-        ));
+        );
 
         let plan_string = format(plan, 0);
         //println!("{plan_string}")
@@ -71,17 +70,17 @@ mod test {
 
     #[test]
     fn test_build_nested_logical_plan() {
-        let plan = Arc::from(Projection::new(
-            Arc::from(Selection::new(
-                Arc::from(Scan::new(
+        let plan = Projection::new(
+            Selection::new(
+                Scan::new(
                     "employee".to_string(),
                     Source::from_csv("testdata/employee.csv", None, true, 1024),
                     vec![],
-                )),
+                ),
                 col("state").eq(lit_str("CO")),
-            )),
+            ),
             vec![col("id"), col("first_name"), col("last_name")],
-        ));
+        );
 
         let plan_string = format(plan, 0);
         //println!("{plan_string}")

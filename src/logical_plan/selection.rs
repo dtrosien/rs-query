@@ -10,8 +10,8 @@ pub struct Selection {
 }
 
 impl Selection {
-    pub fn new(input: Arc<dyn LogicalPlan>, expr: Arc<Expr>) -> Self {
-        Selection { input, expr }
+    pub fn new(input: Arc<dyn LogicalPlan>, expr: Arc<Expr>) -> Arc<Self> {
+        Arc::new(Selection { input, expr })
     }
 }
 
@@ -35,7 +35,7 @@ impl LogicalPlan for Selection {
 #[macro_export]
 macro_rules! selection {
     ($input:expr, $expr:expr) => {
-        std::sync::Arc::new(Selection::new($input, $expr))
+        Selection::new($input, $expr)
     };
 }
 
@@ -48,16 +48,15 @@ mod test {
     use crate::logical_plan::format;
     use crate::logical_plan::scan::Scan;
     use crate::logical_plan::selection::Selection;
-    use std::sync::Arc;
 
     #[test]
     fn test_logical_selection() {
         let csv = Source::from_csv("testdata/employee.csv", None, true, 1024);
-        let scan = Arc::from(Scan::new("employee".to_string(), csv, vec![]));
+        let scan = Scan::new("employee".to_string(), csv, vec![]);
 
         let filter_expr = col("state").eq(lit_str("CO"));
-        let selection = selection!(scan, filter_expr);
-
+        // let selection = selection!(scan, filter_expr);
+        let selection = Selection::new(scan, filter_expr);
         let plan_string = format(selection, 0);
         assert_eq!(
             "Selection: state = CO\n\tScan: employee; projection=None\n",

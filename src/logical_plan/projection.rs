@@ -11,8 +11,8 @@ pub struct Projection {
 }
 
 impl Projection {
-    pub fn new(input: Arc<dyn LogicalPlan>, expr: Vec<Arc<Expr>>) -> Self {
-        Projection { input, expr }
+    pub fn new(input: Arc<dyn LogicalPlan>, expr: Vec<Arc<Expr>>) -> Arc<Self> {
+        Arc::new(Projection { input, expr })
     }
 }
 
@@ -50,14 +50,13 @@ mod test {
     use crate::logical_plan::format;
     use crate::logical_plan::projection::Projection;
     use crate::logical_plan::scan::Scan;
-    use std::sync::Arc;
 
     #[test]
     fn test_logical_projection() {
         let csv = Source::from_csv("testdata/employee.csv", None, true, 1024);
-        let scan = Arc::from(Scan::new("employee".to_string(), csv, vec![]));
+        let scan = Scan::new("employee".to_string(), csv, vec![]);
 
-        let projection = Arc::from(Projection::new(scan, vec![col("id")]));
+        let projection = Projection::new(scan, vec![col("id")]);
         let plan_string = format(projection, 0);
         // println!("{plan_string}");
         assert_eq!(

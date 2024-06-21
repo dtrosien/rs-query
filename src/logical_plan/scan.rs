@@ -13,14 +13,14 @@ pub struct Scan {
 }
 
 impl Scan {
-    pub fn new(path: String, datasource: Arc<Source>, projection: Vec<String>) -> Self {
+    pub fn new(path: String, datasource: Arc<Source>, projection: Vec<String>) -> Arc<Self> {
         let schema = Self::derive_schema(datasource.clone(), projection.clone());
-        Scan {
+        Arc::new(Scan {
             path,
             datasource,
             projection,
             schema,
-        }
+        })
     }
 
     fn derive_schema(datasource: Arc<Source>, projection: Vec<String>) -> Arc<Schema> {
@@ -62,12 +62,11 @@ mod test {
     use crate::datasource::Source;
     use crate::logical_plan::format;
     use crate::logical_plan::scan::Scan;
-    use std::sync::Arc;
 
     #[test]
     fn test_logical_scan() {
         let csv = Source::from_csv("testdata/employee.csv", None, true, 1024);
-        let scan = Arc::from(Scan::new("employee".to_string(), csv, vec![]));
+        let scan = Scan::new("employee".to_string(), csv, vec![]);
         let plan_string = format(scan, 0);
         assert_eq!("Scan: employee; projection=None\n", plan_string);
         //println!("{plan_string}")
