@@ -41,10 +41,10 @@ pub struct LiteralString {
 }
 
 /// Convenience method to create a LiteralString
-pub fn lit_str(value: &str) -> Expr {
-    Expr::Literal(LiteralExpr::LiteralString(LiteralString {
+pub fn lit_str(value: &str) -> Arc<Expr> {
+    Arc::from(Expr::Literal(LiteralExpr::LiteralString(LiteralString {
         str: value.to_string(),
-    }))
+    })))
 }
 
 impl Display for LiteralString {
@@ -68,8 +68,10 @@ pub struct LiteralLong {
 }
 
 /// Convenience method to create a LiteralLong
-pub fn lit_long(value: i64) -> Expr {
-    Expr::Literal(LiteralExpr::LiteralLong(LiteralLong { i: value }))
+pub fn lit_long(value: i64) -> Arc<Expr> {
+    Arc::from(Expr::Literal(LiteralExpr::LiteralLong(LiteralLong {
+        i: value,
+    })))
 }
 
 impl Display for LiteralLong {
@@ -95,8 +97,10 @@ pub struct LiteralFloat {
 }
 
 /// Convenience method to create a LiteralFloat
-pub fn lit_float(value: f32) -> Expr {
-    Expr::Literal(LiteralExpr::LiteralFloat(LiteralFloat { i: value }))
+pub fn lit_float(value: f32) -> Arc<Expr> {
+    Arc::from(Expr::Literal(LiteralExpr::LiteralFloat(LiteralFloat {
+        i: value,
+    })))
 }
 
 impl Display for LiteralFloat {
@@ -122,8 +126,10 @@ pub struct LiteralDouble {
 }
 
 /// Convenience method to create a LiteralDouble
-pub fn lit_double(value: f64) -> Expr {
-    Expr::Literal(LiteralExpr::LiteralDouble(LiteralDouble { i: value }))
+pub fn lit_double(value: f64) -> Arc<Expr> {
+    Arc::from(Expr::Literal(LiteralExpr::LiteralDouble(LiteralDouble {
+        i: value,
+    })))
 }
 
 impl Display for LiteralDouble {

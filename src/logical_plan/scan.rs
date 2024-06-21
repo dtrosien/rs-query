@@ -66,7 +66,7 @@ mod test {
 
     #[test]
     fn test_logical_scan() {
-        let csv = Arc::from(Source::from_csv("testdata/employee.csv", None, true, 1024));
+        let csv = Source::from_csv("testdata/employee.csv", None, true, 1024);
         let scan = Arc::from(Scan::new("employee".to_string(), csv, vec![]));
         let plan_string = format(scan, 0);
         assert_eq!("Scan: employee; projection=None\n", plan_string);

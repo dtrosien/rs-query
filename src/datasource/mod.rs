@@ -46,14 +46,14 @@ impl Source {
         schema: Option<Arc<Schema>>,
         has_headers: bool,
         batch_size: usize,
-    ) -> Self {
+    ) -> Arc<Self> {
         let ds = CsvDataSource::new(file_name, schema, has_headers, batch_size);
-        Source::CSV(ds)
+        Arc::from(Source::CSV(ds))
     }
 
     // Associated function to create an InMemory source
-    pub fn from_in_memory(schema: Arc<Schema>, data: Vec<RecordBatch>) -> Self {
+    pub fn from_in_memory(schema: Arc<Schema>, data: Vec<RecordBatch>) -> Arc<Self> {
         let ds = InMemoryDataSource::new(schema, data);
-        Source::InMemory(ds)
+        Arc::from(Source::InMemory(ds))
     }
 }

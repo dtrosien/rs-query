@@ -84,19 +84,16 @@ mod test {
 
     #[test]
     fn test_logical_selection() {
-        let csv = Arc::from(Source::from_csv("testdata/employee.csv", None, true, 1024));
+        let csv = Source::from_csv("testdata/employee.csv", None, true, 1024);
         let scan = Arc::from(Scan::new("employee".to_string(), csv, vec![]));
 
-        let group_expr = vec![Arc::from(col("state"))];
-        let aggr_expr = vec![max(Arc::from(cast(
-            Arc::from(col("salary")),
-            ArrowType::Int32Type,
-        )))];
+        let group_expr = vec![col("state")];
+        let aggr_expr = vec![max(cast(col("salary"), ArrowType::Int32Type))];
         let aggregate = Arc::from(Aggregate::new(scan, group_expr, aggr_expr));
 
         let plan_string = format(aggregate, 0);
         assert_eq!(
-            "Aggregate: group_expr=state, aggregate_expr=MAX(Cast(salary AS Int32Type))\n\tScan: employee; projection=None\n",
+            "Aggregate: group_expr=state, aggregate_expr=MAX(CAST(salary AS Int32Type))\n\tScan: employee; projection=None\n",
             plan_string
         );
         //println!("{plan_string}")

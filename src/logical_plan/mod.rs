@@ -49,20 +49,16 @@ mod test {
     #[test]
     fn test_build_logical_plan() {
         // create a plan to represent the data source
-        let csv = Arc::from(Source::from_csv("testdata/employee.csv", None, true, 1024));
+        let csv = Source::from_csv("testdata/employee.csv", None, true, 1024);
         // create a plan to represent the scan of the data source (FROM)
         let scan = Arc::from(Scan::new("employee".to_string(), csv, vec![]));
         // create a plan to represent the selection (WHERE)
-        let filter_expr = Arc::from(col("state")).eq(Arc::from(lit_str("CO")));
+        let filter_expr = col("state").eq(lit_str("CO"));
         let selection = Arc::from(Selection::new(scan, filter_expr));
         // create a plan to represent the projection (SELECT)
         let plan = Arc::from(Projection::new(
             selection,
-            vec![
-                Arc::from(col("id")),
-                Arc::from(col("first_name")),
-                Arc::from(col("last_name")),
-            ],
+            vec![col("id"), col("first_name"), col("last_name")],
         ));
 
         let plan_string = format(plan, 0);
@@ -79,47 +75,13 @@ mod test {
             Arc::from(Selection::new(
                 Arc::from(Scan::new(
                     "employee".to_string(),
-                    Arc::from(Source::from_csv("testdata/employee.csv", None, true, 1024)),
+                    Source::from_csv("testdata/employee.csv", None, true, 1024),
                     vec![],
                 )),
-                Arc::from(col("state")).eq(Arc::from(lit_str("CO"))),
+                col("state").eq(lit_str("CO")),
             )),
-            vec![
-                Arc::from(col("id")),
-                Arc::from(col("first_name")),
-                Arc::from(col("last_name")),
-            ],
+            vec![col("id"), col("first_name"), col("last_name")],
         ));
-
-        let plan_string = format(plan, 0);
-        //println!("{plan_string}")
-        assert_eq!(
-            "Projection: id, first_name, last_name\n\tSelection: state = CO\n\t\tScan: employee; projection=None\n",
-            plan_string
-        );
-    }
-
-    #[test]
-    fn test_build_logical_plan_with_aggregation() {
-        // create a plan to represent the data source
-        let csv = Arc::from(Source::from_csv("testdata/employee.csv", None, true, 1024));
-        // create a plan to represent the scan of the data source (FROM)
-        let scan = Arc::from(Scan::new("employee".to_string(), csv, vec![]));
-        // create a plan to represent the selection (WHERE)
-        let filter_expr = Arc::from(col("state")).eq(Arc::from(lit_str("CO")));
-        let selection = Arc::from(Selection::new(scan, filter_expr));
-        // create a plan to represent the projection (SELECT)
-        let plan = Arc::from(Projection::new(
-            selection,
-            vec![
-                Arc::from(col("id")),
-                Arc::from(col("first_name")),
-                Arc::from(col("last_name")),
-            ],
-        ));
-
-        todo!();
-        // todo finish test and streamline arced structs
 
         let plan_string = format(plan, 0);
         //println!("{plan_string}")

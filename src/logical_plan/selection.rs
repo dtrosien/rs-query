@@ -52,10 +52,10 @@ mod test {
 
     #[test]
     fn test_logical_selection() {
-        let csv = Arc::from(Source::from_csv("testdata/employee.csv", None, true, 1024));
+        let csv = Source::from_csv("testdata/employee.csv", None, true, 1024);
         let scan = Arc::from(Scan::new("employee".to_string(), csv, vec![]));
 
-        let filter_expr = Arc::from(col("state")).eq(Arc::from(lit_str("CO")));
+        let filter_expr = col("state").eq(lit_str("CO"));
         let selection = selection!(scan, filter_expr);
 
         let plan_string = format(selection, 0);

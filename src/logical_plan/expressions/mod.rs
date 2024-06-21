@@ -71,10 +71,10 @@ pub struct Column {
 }
 
 /// Convenience method to create a Column reference
-pub fn col(name: &str) -> Expr {
-    Expr::Column(Column {
+pub fn col(name: &str) -> Arc<Expr> {
+    Arc::from(Expr::Column(Column {
         name: name.to_string(),
-    })
+    }))
 }
 
 impl Display for Column {
@@ -138,13 +138,13 @@ pub struct CastExpr {
 }
 
 /// Convenience method to create a CastExpr
-pub fn cast(expr: Arc<Expr>, data_type: ArrowType) -> Expr {
-    Expr::Cast(CastExpr { expr, data_type })
+pub fn cast(expr: Arc<Expr>, data_type: ArrowType) -> Arc<Expr> {
+    Arc::from(Expr::Cast(CastExpr { expr, data_type }))
 }
 
 impl Display for CastExpr {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "Cast({} AS {:?})", self.expr.to_string(), self.data_type)
+        write!(f, "CAST({} AS {:?})", self.expr.to_string(), self.data_type)
     }
 }
 
@@ -198,8 +198,8 @@ mod test {
 
     #[test]
     fn test_display_expressions() {
-        let lit1 = Arc::new(lit_long(5));
-        let lit2 = Arc::new(lit_long(10));
+        let lit1 = lit_long(5);
+        let lit2 = lit_long(10);
 
         let add_result = lit1.clone().add(lit2.clone());
         let sub_result = lit1.clone().subtract(lit2.clone());
@@ -228,8 +228,8 @@ mod test {
 
     #[test]
     fn test_chained_expression() {
-        let col1 = Arc::new(col("COL_1"));
-        let col2 = Arc::new(col("COL_2"));
+        let col1 = col("COL_1");
+        let col2 = col("COL_2");
 
         let col_result = col1.clone().eq(col2.clone());
 
