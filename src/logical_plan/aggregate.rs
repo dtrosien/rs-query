@@ -1,15 +1,15 @@
 use crate::datatypes::schema::{Field, Schema};
-use crate::logical_plan::expressions::aggr_expr::AggrExpr;
 use crate::logical_plan::expressions::Expr;
 use crate::logical_plan::logical_expr::LogicalExpr;
 use crate::logical_plan::LogicalPlan;
+use arrow::array::Array;
 use std::fmt::Display;
 use std::sync::Arc;
 
 pub struct Aggregate {
     input: Arc<dyn LogicalPlan>,
     group_expr: Vec<Arc<Expr>>,
-    aggregate_expr: Vec<Arc<Expr>>, // todo change back to AggrExpr when solution for chaining expressions is found (see also aggr_expr.rs)
+    aggregate_expr: Vec<Arc<Expr>>, // todo use exlicit AggrExpr (or impl trait) if a better solution for expr chaining is found
 }
 
 impl Aggregate {
@@ -18,10 +18,14 @@ impl Aggregate {
         group_expr: Vec<Arc<Expr>>,
         aggregate_expr: Vec<Arc<Expr>>,
     ) -> Arc<Self> {
+        let filtered_aggr_expr: Vec<Arc<Expr>> = aggregate_expr // todo remove filter when a better solution for to exlicit AggrExpr is found
+            .into_iter()
+            .filter(|a| matches!(**a, Expr::Aggr(_)))
+            .collect();
         Arc::new(Aggregate {
             input,
             group_expr,
-            aggregate_expr,
+            aggregate_expr: filtered_aggr_expr,
         })
     }
 }
@@ -47,22 +51,13 @@ impl Display for Aggregate {
 
 impl LogicalPlan for Aggregate {
     fn schema(&self) -> Arc<Schema> {
-        let group_fields: Vec<Arc<Field>> = self
-            .group_expr
-            .iter()
-            // filter_map because to_field returns a result
-            .filter_map(|e| e.to_field(self.input.clone()).ok())
-            .collect();
-        let aggr_fields: Vec<Arc<Field>> = self
+        let fields: Vec<Arc<Field>> = self
             .aggregate_expr
             .iter()
+            .chain(self.group_expr.iter())
             .filter_map(|e| e.to_field(self.input.clone()).ok())
             .collect();
 
-        let fields = group_fields
-            .into_iter()
-            .chain(aggr_fields.into_iter())
-            .collect();
         Arc::from(Schema { fields })
     }
 
@@ -87,14 +82,17 @@ mod test {
         let scan = Scan::new("employee".to_string(), csv, vec![]);
 
         let group_expr = vec![col("state")];
-        let aggr_expr = vec![max(cast(col("salary"), ArrowType::Int32Type))];
+        let aggr_expr = vec![
+            max(cast(col("salary"), ArrowType::Int32Type)),
+            col("must_not_be_in_plan"),
+        ];
         let aggregate = Aggregate::new(scan, group_expr, aggr_expr);
 
         let plan_string = format(aggregate, 0);
+        println!("{plan_string}");
         assert_eq!(
             "Aggregate: group_expr=state, aggregate_expr=MAX(CAST(salary AS Int32Type))\n\tScan: employee; projection=None\n",
             plan_string
         );
-        //println!("{plan_string}")
     }
 }
