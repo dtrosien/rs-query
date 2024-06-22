@@ -1,5 +1,5 @@
 pub mod aggregate;
-mod data_frame;
+pub mod data_frame;
 pub mod expressions;
 pub mod limit;
 pub mod logical_expr;
