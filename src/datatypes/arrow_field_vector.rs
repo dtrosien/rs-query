@@ -1,3 +1,4 @@
+use crate::datatypes::arrow_types::ArrowType;
 use crate::datatypes::column_vector::ColumnVector;
 use arrow::array::{
     Array, ArrayAccessor, ArrayBuilder, BooleanArray, BooleanBuilder, Float32Array, Float32Builder,
@@ -35,12 +36,11 @@ impl ArrowArrayFactory {
     }
 }
 
-// todo test if impl instead of dyn can be used here
 pub struct ArrowFieldVector(pub Arc<Mutex<dyn Array>>);
 
 impl ColumnVector for ArrowFieldVector {
-    fn get_type(&self) -> DataType {
-        self.0.lock().unwrap().data_type().clone()
+    fn get_type(&self) -> ArrowType {
+        ArrowType::from_datatype(&self.0.lock().unwrap().data_type().clone())
     }
 
     fn get_value(&self, i: usize) -> Option<Arc<dyn Any>> {
@@ -144,7 +144,7 @@ mod test {
 
         let data_type = column_vector.get_type();
 
-        assert!(&data_type.equals_datatype(&DataType::Int64))
+        assert!(&data_type.to_datatype().equals_datatype(&DataType::Int64))
     }
 
     fn create_test_i64_column_vector(values: Vec<Box<dyn Any>>) -> Arc<dyn ColumnVector> {

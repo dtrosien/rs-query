@@ -1,15 +1,16 @@
+use crate::datatypes::arrow_types::ArrowType;
 use crate::datatypes::column_vector::ColumnVector;
 use std::any::Any;
 use std::sync::Arc;
 
-struct LiteralValueVector {
-    arrow_type: arrow::datatypes::DataType,
-    value: Option<Arc<dyn Any>>,
-    size: usize,
+pub struct LiteralValueVector {
+    pub arrow_type: ArrowType,
+    pub value: Option<Arc<dyn Any>>,
+    pub size: usize,
 }
 
 impl ColumnVector for LiteralValueVector {
-    fn get_type(&self) -> arrow::datatypes::DataType {
+    fn get_type(&self) -> ArrowType {
         self.arrow_type.clone()
     }
 

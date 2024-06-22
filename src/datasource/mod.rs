@@ -1,5 +1,5 @@
 mod csv_data_source;
-pub mod in_memory_data_source;
+mod in_memory_data_source;
 
 use crate::datasource::csv_data_source::CsvDataSource;
 use crate::datasource::in_memory_data_source::InMemoryDataSource;
@@ -7,7 +7,7 @@ use crate::datatypes::record_batch::RecordBatch;
 use crate::datatypes::schema::Schema;
 use std::sync::Arc;
 
-// todo maybe use scan(&self, projection: Vec<&str>) -> Box<dyn Iterator<Item = RecordBatch>> and get rid of enum here (I dont think Arc<Source> is necessary in logical_plan ...)
+// todo maybe i can remove Source enum of enum here since i switched to Boxed dyn iterator
 
 pub trait DataSource {
     /// Return the schema for the underlying data source

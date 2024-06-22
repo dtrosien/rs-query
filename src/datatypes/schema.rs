@@ -1,11 +1,12 @@
 use crate::datatypes::arrow_types::ArrowType;
 use arrow::datatypes::{DataType, Field as ArrowField, Schema as ArrowSchema};
 use std::collections::HashMap;
+use std::fmt;
 use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct Schema {
-    pub fields: Vec<Arc<Field>>, // todo used Arc<Field> instead of just Field ... check later if that is really better for most cases
+    pub fields: Vec<Arc<Field>>,
 }
 
 impl Schema {
@@ -53,10 +54,23 @@ impl Schema {
     }
 }
 
+impl fmt::Display for Schema {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[")?;
+        for (i, field) in self.fields.iter().enumerate() {
+            if i != 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}: {:?}", field.name, field.data_type)?;
+        }
+        write!(f, "]")
+    }
+}
+
 #[derive(Clone)]
 pub struct Field {
     pub name: String,
-    pub data_type: ArrowType, // todo use own arrow_type (like done in kquery)
+    pub data_type: ArrowType,
 }
 
 impl Field {
@@ -94,5 +108,22 @@ mod test {
         assert_eq!(first_arrow_field.name(), "test1");
         assert_eq!(first_arrow_field.data_type(), &DataType::Utf8);
         assert_eq!(num_fields, 2)
+    }
+
+    #[test]
+    fn test_display_schema() {
+        let field1 = Arc::new(Field {
+            name: "test1".to_string(),
+            data_type: ArrowType::StringType,
+        });
+        let field2 = Arc::new(Field {
+            name: "test2".to_string(),
+            data_type: ArrowType::Int64Type,
+        });
+        let schema = Schema {
+            fields: vec![field1, field2],
+        };
+
+        assert_eq!("[test1: StringType, test2: Int64Type]", format!("{schema}"));
     }
 }

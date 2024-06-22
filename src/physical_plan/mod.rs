@@ -1,8 +1,10 @@
 use crate::datatypes::record_batch::RecordBatch;
-use arrow::datatypes::Schema;
+use crate::datatypes::schema::Schema;
 use std::sync::Arc;
 
 pub mod expressions;
+pub mod scan_exec;
+pub mod selection_exec;
 
 /// A physical plan represents an executable piece of code that will produce data.
 pub trait PhysicalPlan: ToString {
@@ -10,7 +12,7 @@ pub trait PhysicalPlan: ToString {
     fn schema(&self) -> Arc<Schema>;
 
     /// Execute a physical plan and produce a series of record batches.
-    fn execute(&self) -> Box<dyn Iterator<Item = RecordBatch>>;
+    fn execute(&self) -> Box<dyn Iterator<Item = RecordBatch> + '_>;
 
     /// Returns the children (inputs) of this physical plan.
     /// This method is used to enable use of the visitor pattern to walk a query tree.
