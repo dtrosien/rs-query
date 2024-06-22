@@ -202,7 +202,6 @@ impl CsvReaderIterator {
 
 #[cfg(test)]
 mod test {
-    use crate::datasource::csv_data_source::CsvDataSource;
     use crate::datasource::{DataSource, Source};
     use crate::datatypes::arrow_types::ArrowType;
     use crate::datatypes::record_batch::RecordBatch;

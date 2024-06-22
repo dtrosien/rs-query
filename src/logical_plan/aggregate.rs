@@ -89,7 +89,7 @@ mod test {
         let aggregate = Aggregate::new(scan, group_expr, aggr_expr);
 
         let plan_string = format(aggregate, 0);
-        println!("{plan_string}");
+        //println!("{plan_string}");
         assert_eq!(
             "Aggregate: group_expr=state, aggregate_expr=MAX(CAST(salary AS Int32Type))\n\tScan: employee; projection=None\n",
             plan_string

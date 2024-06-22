@@ -71,10 +71,8 @@ pub struct Column {
 }
 
 /// Convenience method to create a Column reference
-pub fn col(name: &str) -> Arc<Expr> {
-    Arc::from(Expr::Column(Column {
-        name: name.to_string(),
-    }))
+pub fn col(name: impl Into<String>) -> Arc<Expr> {
+    Arc::from(Expr::Column(Column { name: name.into() }))
 }
 
 impl Display for Column {
@@ -180,7 +178,7 @@ impl Alias {
 }
 
 impl Display for Alias {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{} AS {}", self.expr.to_string(), self.alias)
     }
 }
