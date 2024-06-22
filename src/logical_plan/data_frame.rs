@@ -104,7 +104,7 @@ mod test {
     use crate::logical_plan::expressions::literal_expr::{lit_float, lit_long, lit_str};
     use crate::logical_plan::expressions::math_expr::MathExprExt;
     use crate::logical_plan::expressions::{alias, col};
-    use crate::logical_plan::PlanPrinter;
+    use crate::logical_plan::LogicalPlanPrinter;
     use std::sync::Arc;
 
     #[test]

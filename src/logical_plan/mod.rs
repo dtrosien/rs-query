@@ -17,11 +17,11 @@ trait LogicalPlan: ToString {
 
 /// trait to pretty print LogicalPlan
 /// outside logical plan because otherwise it does not work with ?Sized
-pub trait PlanPrinter {
+pub trait LogicalPlanPrinter {
     fn pretty(&self) -> String;
 }
 /// pretty prints LogicalPlan objects
-impl PlanPrinter for Arc<dyn LogicalPlan> {
+impl LogicalPlanPrinter for Arc<dyn LogicalPlan> {
     fn pretty(&self) -> String {
         format(self.clone(), 0)
     }
