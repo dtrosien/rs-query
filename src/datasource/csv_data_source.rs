@@ -25,7 +25,7 @@ impl DataSource for CsvDataSource {
         self.schema.clone()
     }
 
-    fn scan(&self, projection: Vec<&str>) -> impl Iterator<Item = RecordBatch> {
+    fn scan(&self, projection: Vec<&str>) -> Box<dyn Iterator<Item = RecordBatch> + '_> {
         info!("scan() projection={}", projection.concat());
 
         let file = Self::open_file(&self.file_name);
@@ -43,7 +43,7 @@ impl DataSource for CsvDataSource {
             batch_size: self.batch_size,
             reader,
         };
-        r.into_iter()
+        Box::new(r.into_iter())
     }
 }
 

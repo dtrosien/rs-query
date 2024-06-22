@@ -19,7 +19,7 @@ impl DataSource for InMemoryDataSource {
         self.schema.clone()
     }
 
-    fn scan(&self, projection: Vec<&str>) -> impl Iterator<Item = RecordBatch> {
+    fn scan(&self, projection: Vec<&str>) -> Box<dyn Iterator<Item = RecordBatch> + '_> {
         let projection_indices: Vec<usize> = projection
             .iter()
             .map(|name| {
@@ -31,9 +31,9 @@ impl DataSource for InMemoryDataSource {
             })
             .collect();
 
-        self.data.iter().map(move |batch| RecordBatch {
+        Box::new(self.data.iter().map(move |batch| RecordBatch {
             schema: self.schema.clone(),
             fields: projection_indices.iter().map(|i| batch.field(*i)).collect(),
-        })
+        }))
     }
 }

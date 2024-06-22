@@ -14,7 +14,7 @@ pub trait DataSource {
     fn schema(&self) -> Arc<Schema>;
 
     /// Scan the data source, selecting the specified columns
-    fn scan(&self, projection: Vec<&str>) -> impl Iterator<Item = RecordBatch>;
+    fn scan(&self, projection: Vec<&str>) -> Box<dyn Iterator<Item = RecordBatch> + '_>;
 }
 
 pub enum Source {
