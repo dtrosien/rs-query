@@ -19,6 +19,7 @@ use anyhow::anyhow;
 use std::fmt::{Display, Formatter, Pointer};
 use std::sync::Arc;
 
+// todo rename to not confuse with physical expression
 pub enum Expr {
     Column(Column),
     ColumnIndex(ColumnIndex),

@@ -17,7 +17,7 @@ impl Display for ColumnExpression {
 }
 
 impl Expression for ColumnExpression {
-    fn evaluate(&self, input: RecordBatch) -> Arc<dyn ColumnVector> {
+    fn evaluate(&self, input: &RecordBatch) -> Arc<dyn ColumnVector> {
         input.field(self.i)
     }
 }

@@ -10,7 +10,7 @@ use std::sync::Arc;
 
 pub trait Expression: ToString {
     /// Evaluate the expression against an input record batch and produce a column of data as output
-    fn evaluate(&self, input: RecordBatch) -> Arc<dyn ColumnVector>;
+    fn evaluate(&self, input: &RecordBatch) -> Arc<dyn ColumnVector>;
 }
 
 pub trait Accumulator {
@@ -29,7 +29,7 @@ impl Display for LiteralLongExpression {
 }
 
 impl Expression for LiteralLongExpression {
-    fn evaluate(&self, input: RecordBatch) -> Arc<dyn ColumnVector> {
+    fn evaluate(&self, input: &RecordBatch) -> Arc<dyn ColumnVector> {
         Arc::new(LiteralValueVector {
             arrow_type: ArrowType::Int64Type,
             value: Some(Arc::new(self.value)),
@@ -49,7 +49,7 @@ impl Display for LiteralDoubleExpression {
 }
 
 impl Expression for LiteralDoubleExpression {
-    fn evaluate(&self, input: RecordBatch) -> Arc<dyn ColumnVector> {
+    fn evaluate(&self, input: &RecordBatch) -> Arc<dyn ColumnVector> {
         Arc::new(LiteralValueVector {
             arrow_type: ArrowType::DoubleType,
             value: Some(Arc::new(self.value)),
@@ -68,7 +68,7 @@ impl Display for LiteralStringExpression {
 }
 
 impl Expression for LiteralStringExpression {
-    fn evaluate(&self, input: RecordBatch) -> Arc<dyn ColumnVector> {
+    fn evaluate(&self, input: &RecordBatch) -> Arc<dyn ColumnVector> {
         Arc::new(LiteralValueVector {
             arrow_type: ArrowType::StringType,
             value: Some(Arc::new(self.value.clone())),
