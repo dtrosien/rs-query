@@ -49,14 +49,17 @@ impl PhysicalPlan for SelectionExec {
 }
 fn filter(v: Arc<dyn ColumnVector>, selection: Arc<dyn ColumnVector>) -> Arc<dyn ColumnVector> {
     let array = ArrowArrayFactory::create(v.get_type().to_datatype().clone(), selection.size());
-    let mut filtered_vector_builder = ArrowVectorBuilder::new(array);
+    let mut filtered_vector = ArrowVectorBuilder::new(array);
 
     for i in 0..selection.size() {
-        let binding = selection.get_value(i).unwrap();
-        if *binding.downcast_ref::<bool>().unwrap() {
-            filtered_vector_builder.append(v.get_value(i));
-        };
+        if selection
+            .get_value(i)
+            .and_then(|v| v.downcast_ref::<bool>().cloned())
+            .unwrap_or(false)
+        {
+            filtered_vector.append(v.get_value(i));
+        }
     }
 
-    filtered_vector_builder.build()
+    filtered_vector.build()
 }
