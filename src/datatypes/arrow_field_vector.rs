@@ -121,7 +121,7 @@ mod test {
     #[test]
     fn test_size() {
         let column_vector =
-            create_test_i64_column_vector(vec![Box::new(12), Box::new(12), Box::new("12")]);
+            create_test_i64_column_vector(vec![Arc::new(12), Arc::new(12), Arc::new("12")]);
 
         let size = column_vector.size();
 
@@ -130,7 +130,7 @@ mod test {
 
     #[test]
     fn test_get_value() {
-        let column_vector = create_test_i64_column_vector(vec![Box::new(12), Box::new("77")]);
+        let column_vector = create_test_i64_column_vector(vec![Arc::new(12), Arc::new("77")]);
 
         let binding = column_vector.get_value(1).unwrap();
         let value = *binding.downcast_ref::<i64>().unwrap();
@@ -140,14 +140,14 @@ mod test {
 
     #[test]
     fn test_get_type() {
-        let column_vector = create_test_i64_column_vector(vec![Box::new(12)]);
+        let column_vector = create_test_i64_column_vector(vec![Arc::new(12)]);
 
         let data_type = column_vector.get_type();
 
         assert!(&data_type.to_datatype().equals_datatype(&DataType::Int64))
     }
 
-    fn create_test_i64_column_vector(values: Vec<Box<dyn Any>>) -> Arc<dyn ColumnVector> {
+    fn create_test_i64_column_vector(values: Vec<Arc<dyn Any>>) -> Arc<dyn ColumnVector> {
         let field_vector_builder = ArrowArrayFactory::create(DataType::Int64, values.len());
         let mut builder = ArrowVectorBuilder::new(field_vector_builder);
 

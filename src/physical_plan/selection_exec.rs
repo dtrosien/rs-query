@@ -1,3 +1,6 @@
+use crate::datatypes::arrow_field_vector::ArrowArrayFactory;
+use crate::datatypes::arrow_vector_builder::ArrowVectorBuilder;
+use crate::datatypes::column_vector::ColumnVector;
 use crate::datatypes::record_batch::RecordBatch;
 use crate::datatypes::schema::Schema;
 use crate::physical_plan::expressions::Expression;
@@ -22,10 +25,38 @@ impl PhysicalPlan for SelectionExec {
     }
 
     fn execute(&self) -> Box<dyn Iterator<Item = RecordBatch> + '_> {
-        todo!()
+        let input = self.input.execute();
+        Box::new(input.map(move |batch| {
+            let result = self.expr.evaluate(&batch);
+
+            let schema = batch.schema.clone();
+            let column_count = batch.schema.fields.len();
+
+            let filtered_fields: Vec<Arc<dyn ColumnVector>> = (0..column_count)
+                .map(|i| filter(batch.field(i), result.clone()))
+                .collect();
+
+            RecordBatch {
+                schema,
+                fields: filtered_fields,
+            }
+        }))
     }
 
     fn children(&self) -> Vec<Arc<dyn PhysicalPlan>> {
         vec![self.input.clone()]
     }
+}
+fn filter(v: Arc<dyn ColumnVector>, selection: Arc<dyn ColumnVector>) -> Arc<dyn ColumnVector> {
+    let array = ArrowArrayFactory::create(v.get_type().to_datatype().clone(), selection.size());
+    let mut filtered_vector_builder = ArrowVectorBuilder::new(array);
+
+    for i in 0..selection.size() {
+        let binding = selection.get_value(i).unwrap();
+        if *binding.downcast_ref::<bool>().unwrap() {
+            filtered_vector_builder.append(v.get_value(i));
+        };
+    }
+
+    filtered_vector_builder.build()
 }

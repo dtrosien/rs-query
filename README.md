@@ -6,7 +6,7 @@ An educational query engine project based on:
 
 ## To-Do List
 
-- [ ] next steps: SelectionExec fertig, dann query planner, dann expressions checken und evtl ueberarbeiten
+- [ ] next steps: query planner, dann expressions checken und evtl ueberarbeiten
 - [ ] write tests for physical plans
 - [ ] write test data (RecordBatches etc) generator or use a crate like fake or quickcheck for that
 - [ ] write query planner to check if physical plan works like intended

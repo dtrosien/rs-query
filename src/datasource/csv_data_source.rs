@@ -183,7 +183,7 @@ impl CsvReaderIterator {
             for (index, field) in field_builders.iter_mut() {
                 let value = row
                     .get(*index)
-                    .map(|str_value| Box::new(str_value.to_string()) as Box<dyn Any>);
+                    .map(|str_value| Arc::new(str_value.to_string()) as Arc<dyn Any>);
                 field.append(value)
             }
         });

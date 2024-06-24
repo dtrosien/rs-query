@@ -17,7 +17,7 @@ impl ArrowVectorBuilder {
     }
 
     // todo clean up repetitions etc
-    pub fn append(&mut self, value: Option<Box<dyn Any>>) {
+    pub fn append(&mut self, value: Option<Arc<dyn Any>>) {
         if let Some(string_builder) = self
             .arrow_array_builder
             .as_any_mut()
@@ -250,15 +250,16 @@ mod test {
     use crate::datatypes::arrow_field_vector::ArrowArrayFactory;
     use crate::datatypes::arrow_vector_builder::ArrowVectorBuilder;
     use arrow::datatypes::DataType;
+    use std::sync::Arc;
 
     #[test]
     fn test_builder() {
         let field_vector_builder = ArrowArrayFactory::create(DataType::Int64, 5);
         let mut builder = ArrowVectorBuilder::new(field_vector_builder);
 
-        builder.append(Some(Box::new(12)));
-        builder.append(Some(Box::new(122)));
-        builder.append(Some(Box::new("22")));
+        builder.append(Some(Arc::new(12)));
+        builder.append(Some(Arc::new(122)));
+        builder.append(Some(Arc::new("22")));
 
         let column_vector = builder.build();
         let binding = column_vector.get_value(2).unwrap();
