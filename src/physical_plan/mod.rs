@@ -3,7 +3,7 @@ use crate::datatypes::schema::Schema;
 use std::sync::Arc;
 
 pub mod expressions;
-mod projection_exec;
+pub mod projection_exec;
 pub mod scan_exec;
 pub mod selection_exec;
 

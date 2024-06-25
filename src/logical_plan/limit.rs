@@ -1,5 +1,6 @@
 use crate::datatypes::schema::Schema;
 use crate::logical_plan::LogicalPlan;
+use std::any::Any;
 use std::fmt::Display;
 use std::sync::Arc;
 
@@ -28,5 +29,9 @@ impl LogicalPlan for Limit {
 
     fn children(&self) -> Vec<Arc<dyn LogicalPlan>> {
         vec![self.input.clone()]
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }

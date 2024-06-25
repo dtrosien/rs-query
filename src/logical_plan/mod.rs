@@ -8,11 +8,14 @@ pub mod scan;
 pub mod selection;
 
 use crate::datatypes::schema::Schema;
+use std::any::Any;
 use std::sync::Arc;
 
-trait LogicalPlan: ToString {
+pub trait LogicalPlan: ToString + Any {
     fn schema(&self) -> Arc<Schema>;
     fn children(&self) -> Vec<Arc<dyn LogicalPlan>>;
+
+    fn as_any(&self) -> &dyn Any;
 }
 
 /// trait to pretty print LogicalPlan

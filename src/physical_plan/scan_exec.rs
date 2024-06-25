@@ -7,8 +7,8 @@ use std::fmt::Display;
 use std::sync::Arc;
 
 pub struct ScanExec {
-    ds: Arc<Source>,
-    projection: Vec<String>,
+    pub ds: Arc<Source>,
+    pub projection: Vec<String>,
 }
 
 impl Display for ScanExec {

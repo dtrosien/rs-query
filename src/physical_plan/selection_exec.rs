@@ -9,8 +9,8 @@ use std::fmt::Display;
 use std::sync::Arc;
 
 pub struct SelectionExec {
-    input: Arc<dyn PhysicalPlan>,
-    expr: Arc<dyn Expression>,
+    pub input: Arc<dyn PhysicalPlan>,
+    pub expr: Arc<dyn Expression>,
 }
 
 impl Display for SelectionExec {

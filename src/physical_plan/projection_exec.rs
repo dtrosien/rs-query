@@ -7,9 +7,9 @@ use std::fmt::Display;
 use std::sync::Arc;
 
 pub struct ProjectionExec {
-    input: Arc<dyn PhysicalPlan>,
-    schema: Arc<Schema>,
-    expr: Vec<Arc<dyn Expression>>,
+    pub input: Arc<dyn PhysicalPlan>,
+    pub schema: Arc<Schema>,
+    pub expr: Vec<Arc<dyn Expression>>,
 }
 
 impl Display for ProjectionExec {

@@ -1,12 +1,13 @@
 use crate::datatypes::schema::Schema;
 use crate::logical_plan::expressions::Expr;
 use crate::logical_plan::LogicalPlan;
+use std::any::Any;
 use std::fmt::Display;
 use std::sync::Arc;
 
 pub struct Selection {
-    input: Arc<dyn LogicalPlan>,
-    expr: Arc<Expr>,
+    pub input: Arc<dyn LogicalPlan>,
+    pub expr: Arc<Expr>,
 }
 
 impl Selection {
@@ -28,6 +29,10 @@ impl LogicalPlan for Selection {
 
     fn children(&self) -> Vec<Arc<dyn LogicalPlan>> {
         vec![self.input.clone()]
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 

@@ -1,14 +1,15 @@
 use crate::datasource::{DataSource, Source};
 use crate::datatypes::schema::Schema;
 use crate::logical_plan::LogicalPlan;
+use std::any::Any;
 use std::fmt::Display;
 use std::sync::Arc;
 
 /// Represents a scan of a data source
 pub struct Scan {
     path: String,
-    datasource: Arc<Source>,
-    projection: Vec<String>,
+    pub datasource: Arc<Source>,
+    pub projection: Vec<String>,
     schema: Arc<Schema>,
 }
 
@@ -54,6 +55,10 @@ impl LogicalPlan for Scan {
 
     fn children(&self) -> Vec<Arc<dyn LogicalPlan>> {
         vec![]
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 

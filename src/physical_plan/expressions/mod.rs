@@ -19,7 +19,7 @@ pub trait Accumulator {
 }
 
 pub struct LiteralLongExpression {
-    value: isize,
+    pub value: i64,
 }
 
 impl Display for LiteralLongExpression {
@@ -39,7 +39,7 @@ impl Expression for LiteralLongExpression {
 }
 
 pub struct LiteralDoubleExpression {
-    value: f64,
+    pub value: f64,
 }
 
 impl Display for LiteralDoubleExpression {
@@ -58,7 +58,7 @@ impl Expression for LiteralDoubleExpression {
     }
 }
 pub struct LiteralStringExpression {
-    value: String,
+    pub value: String,
 }
 
 impl Display for LiteralStringExpression {

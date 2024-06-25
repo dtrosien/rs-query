@@ -37,7 +37,7 @@ impl LogicalExpr for LiteralExpr {
 
 /// Logical expression representing a literal string value.
 pub struct LiteralString {
-    str: String,
+    pub str: String,
 }
 
 /// Convenience method to create a LiteralString
@@ -93,7 +93,7 @@ impl LogicalExpr for LiteralLong {
 
 /// Logical expression representing a literal float value.
 pub struct LiteralFloat {
-    i: f32,
+    pub i: f32,
 }
 
 /// Convenience method to create a LiteralFloat
@@ -122,7 +122,7 @@ impl LogicalExpr for LiteralFloat {
 
 /// Logical expression representing a literal double value.
 pub struct LiteralDouble {
-    i: f64,
+    pub i: f64,
 }
 
 /// Convenience method to create a LiteralDouble
