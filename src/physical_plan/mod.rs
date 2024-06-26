@@ -13,7 +13,7 @@ pub trait PhysicalPlan: ToString {
     fn schema(&self) -> Arc<Schema>;
 
     /// Execute a physical plan and produce a series of record batches.
-    fn execute(&self) -> Box<dyn Iterator<Item = RecordBatch> + '_>;
+    fn execute(&self) -> Box<dyn Iterator<Item = RecordBatch> + '_>; // todo maybe better Item = Arc<RecordBatch> in case iterator is collected? see executionContext
 
     /// Returns the children (inputs) of this physical plan.
     /// This method is used to enable use of the visitor pattern to walk a query tree.

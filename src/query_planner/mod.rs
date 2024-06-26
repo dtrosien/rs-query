@@ -21,7 +21,7 @@ pub struct QueryPlanner;
 
 impl QueryPlanner {
     pub fn create_physical_plan(plan: Arc<dyn LogicalPlan>) -> Arc<dyn PhysicalPlan> {
-        if let Some(scan) = plan.as_any().downcast_ref::<Arc<Scan>>() {
+        if let Some(scan) = plan.as_any().downcast_ref::<Scan>() {
             return Arc::new(ScanExec {
                 ds: scan.datasource.clone(),
                 projection: scan.projection.clone(),

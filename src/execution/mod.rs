@@ -4,6 +4,7 @@ use crate::datatypes::schema::Schema;
 use crate::logical_plan::data_frame::{DataFrame, DataFrameImpl};
 use crate::logical_plan::scan::Scan;
 use crate::logical_plan::LogicalPlan;
+use crate::query_planner::QueryPlanner;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -83,10 +84,16 @@ impl ExecutionContext {
 
     /// Execute the logical plan represented by a DataFrame
     pub fn execute(&self, df: Arc<dyn DataFrame>) -> Box<dyn Iterator<Item = RecordBatch> + '_> {
-        todo!()
+        self.execute_logical_plan(df.logical_plan())
     }
+
     /// Execute the provided logical plan
-    fn execute_logical_plan(plan: Arc<dyn LogicalPlan>) -> Box<dyn Iterator<Item = RecordBatch>> {
-        todo!()
+    fn execute_logical_plan(
+        &self,
+        plan: Arc<dyn LogicalPlan>,
+    ) -> Box<dyn Iterator<Item = RecordBatch> + '_> {
+        let physical_plan = QueryPlanner::create_physical_plan(plan);
+        let batches: Vec<RecordBatch> = physical_plan.execute().collect(); // todo think about better solution
+        Box::new(batches.into_iter())
     }
 }
