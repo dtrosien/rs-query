@@ -73,7 +73,7 @@ impl LogicalPlan for Aggregate {
 
 #[cfg(test)]
 mod test {
-    use crate::datasource::Source;
+    use crate::data_source::Source;
     use crate::datatypes::arrow_types::ArrowType;
     use crate::logical_plan::aggregate::Aggregate;
     use crate::logical_plan::expressions::aggr_expr::max;

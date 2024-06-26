@@ -1,4 +1,4 @@
-use crate::datasource::DataSource;
+use crate::data_source::DataSource;
 use crate::datatypes::record_batch::RecordBatch;
 use crate::datatypes::schema::Schema;
 use std::sync::Arc;

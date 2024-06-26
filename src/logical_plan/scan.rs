@@ -1,4 +1,4 @@
-use crate::datasource::{DataSource, Source};
+use crate::data_source::{DataSource, Source};
 use crate::datatypes::schema::Schema;
 use crate::logical_plan::LogicalPlan;
 use std::any::Any;
@@ -14,10 +14,14 @@ pub struct Scan {
 }
 
 impl Scan {
-    pub fn new(path: String, datasource: Arc<Source>, projection: Vec<String>) -> Arc<Self> {
+    pub fn new(
+        path: impl Into<String>,
+        datasource: Arc<Source>,
+        projection: Vec<String>,
+    ) -> Arc<Self> {
         let schema = Self::derive_schema(datasource.clone(), projection.clone());
         Arc::new(Scan {
-            path,
+            path: path.into(),
             datasource,
             projection,
             schema,
@@ -64,7 +68,7 @@ impl LogicalPlan for Scan {
 
 #[cfg(test)]
 mod test {
-    use crate::datasource::Source;
+    use crate::data_source::Source;
     use crate::logical_plan::format;
     use crate::logical_plan::scan::Scan;
 

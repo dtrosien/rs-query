@@ -1,4 +1,4 @@
-use crate::datasource::DataSource;
+use crate::data_source::DataSource;
 use crate::datatypes::arrow_field_vector::ArrowArrayFactory;
 use crate::datatypes::arrow_types::ArrowType;
 use crate::datatypes::arrow_vector_builder::ArrowVectorBuilder;
@@ -49,15 +49,17 @@ impl DataSource for CsvDataSource {
 
 impl CsvDataSource {
     pub fn new(
-        file_name: &str,
+        file_name: impl Into<String>,
         schema: Option<Arc<Schema>>,
         has_headers: bool,
         batch_size: usize,
     ) -> Self {
-        let schema = schema
-            .unwrap_or_else(|| Arc::from(Self::infer_schema(has_headers, file_name).unwrap()));
+        let file_name = file_name.into();
+        let schema = schema.unwrap_or_else(|| {
+            Arc::from(Self::infer_schema(has_headers, file_name.as_str()).unwrap())
+        });
         CsvDataSource {
-            file_name: file_name.to_owned(),
+            file_name,
             schema,
             has_headers,
             batch_size,
@@ -202,7 +204,7 @@ impl CsvReaderIterator {
 
 #[cfg(test)]
 mod test {
-    use crate::datasource::{DataSource, Source};
+    use crate::data_source::{DataSource, Source};
     use crate::datatypes::arrow_types::ArrowType;
     use crate::datatypes::record_batch::RecordBatch;
     use crate::datatypes::schema::{Field, Schema};

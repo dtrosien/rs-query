@@ -1,10 +1,7 @@
-use crate::datasource::Source;
-use crate::datatypes::record_batch::RecordBatch;
 use crate::datatypes::schema::Schema;
 use crate::logical_plan::aggregate::Aggregate;
 use crate::logical_plan::expressions::Expr;
 use crate::logical_plan::projection::Projection;
-use crate::logical_plan::scan::Scan;
 use crate::logical_plan::selection::Selection;
 use crate::logical_plan::LogicalPlan;
 use std::sync::Arc;
@@ -30,8 +27,8 @@ pub trait DataFrame {
     fn logical_plan(self: Arc<Self>) -> Arc<dyn LogicalPlan>;
 }
 
-struct DataFrameImpl {
-    plan: Arc<dyn LogicalPlan>,
+pub struct DataFrameImpl {
+    pub plan: Arc<dyn LogicalPlan>,
 }
 
 impl DataFrame for DataFrameImpl {
@@ -66,44 +63,16 @@ impl DataFrame for DataFrameImpl {
     }
 }
 
-/// Convenience Dataframe builder for supported DataSources
-pub struct DF {}
-
-impl DF {
-    pub fn from_csv(
-        file_name: &str,
-        schema: Option<Arc<Schema>>,
-        has_headers: bool,
-        batch_size: usize,
-    ) -> Arc<dyn DataFrame> {
-        Arc::new(DataFrameImpl {
-            plan: Scan::new(
-                file_name.to_string(),
-                Source::from_csv(file_name, schema, has_headers, batch_size),
-                vec![],
-            ),
-        })
-    }
-
-    pub fn from_in_memory(schema: Arc<Schema>, data: Vec<RecordBatch>) -> Arc<dyn DataFrame> {
-        Arc::new(DataFrameImpl {
-            plan: Scan::new(
-                "in_memory".to_string(),
-                Source::from_in_memory(schema, data),
-                vec![],
-            ),
-        })
-    }
-}
-
 #[cfg(test)]
 mod test {
-    use crate::logical_plan::data_frame::{DataFrame, DF};
+    use crate::data_source::Source;
+    use crate::logical_plan::data_frame::{DataFrame, DataFrameImpl};
     use crate::logical_plan::expressions::aggr_expr::{count, max, min};
     use crate::logical_plan::expressions::binary_expr::BooleanBinaryExprExt;
     use crate::logical_plan::expressions::literal_expr::{lit_float, lit_long, lit_str};
     use crate::logical_plan::expressions::math_expr::MathExprExt;
     use crate::logical_plan::expressions::{alias, col};
+    use crate::logical_plan::scan::Scan;
     use crate::logical_plan::LogicalPlanPrinter;
     use std::sync::Arc;
 
@@ -162,6 +131,12 @@ mod test {
     }
 
     fn test_csv() -> Arc<dyn DataFrame> {
-        DF::from_csv("testdata/employee.csv", None, true, 1024)
+        Arc::new(DataFrameImpl {
+            plan: Scan::new(
+                "testdata/employee.csv".to_string(),
+                Source::from_csv("testdata/employee.csv", None, true, 1024),
+                vec![],
+            ),
+        })
     }
 }

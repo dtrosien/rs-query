@@ -1,8 +1,8 @@
-mod csv_data_source;
-mod in_memory_data_source;
+pub mod csv_data_source;
+pub mod in_memory_data_source;
 
-use crate::datasource::csv_data_source::CsvDataSource;
-use crate::datasource::in_memory_data_source::InMemoryDataSource;
+use crate::data_source::csv_data_source::CsvDataSource;
+use crate::data_source::in_memory_data_source::InMemoryDataSource;
 use crate::datatypes::record_batch::RecordBatch;
 use crate::datatypes::schema::Schema;
 use std::sync::Arc;
@@ -42,7 +42,7 @@ impl Source {
 
     // Associated function to create a CSV source
     pub fn from_csv(
-        file_name: &str,
+        file_name: impl Into<String>,
         schema: Option<Arc<Schema>>,
         has_headers: bool,
         batch_size: usize,

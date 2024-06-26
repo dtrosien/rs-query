@@ -1,4 +1,4 @@
-use crate::datasource::{DataSource, Source};
+use crate::data_source::{DataSource, Source};
 use crate::datatypes::record_batch::RecordBatch;
 use crate::datatypes::schema::Schema;
 use crate::logical_plan::data_frame::DataFrame;

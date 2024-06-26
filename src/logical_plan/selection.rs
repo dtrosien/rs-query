@@ -45,7 +45,7 @@ macro_rules! selection {
 
 #[cfg(test)]
 mod test {
-    use crate::datasource::Source;
+    use crate::data_source::Source;
     use crate::logical_plan::expressions::binary_expr::BooleanBinaryExprExt;
     use crate::logical_plan::expressions::col;
     use crate::logical_plan::expressions::literal_expr::lit_str;

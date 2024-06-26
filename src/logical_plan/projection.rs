@@ -50,7 +50,7 @@ impl LogicalPlan for Projection {
 
 #[cfg(test)]
 mod test {
-    use crate::datasource::Source;
+    use crate::data_source::Source;
     use crate::logical_plan::expressions::col;
     use crate::logical_plan::format;
     use crate::logical_plan::projection::Projection;
