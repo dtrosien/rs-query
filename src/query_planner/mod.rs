@@ -1,4 +1,5 @@
 use crate::datatypes::schema::{Field, Schema};
+use crate::logical_plan::aggregate::Aggregate;
 use crate::logical_plan::expressions::literal_expr::LiteralExpr;
 use crate::logical_plan::expressions::Expr;
 use crate::logical_plan::logical_expr::LogicalExpr;
@@ -13,35 +14,34 @@ use crate::physical_plan::projection_exec::ProjectionExec;
 use crate::physical_plan::scan_exec::ScanExec;
 use crate::physical_plan::selection_exec::SelectionExec;
 use crate::physical_plan::PhysicalPlan;
+use std::ops::Deref;
 use std::sync::Arc;
 
 pub struct QueryPlanner;
-// if there is still a problem maybe look here:
-// https://stackoverflow.com/questions/33687447/how-to-get-a-reference-to-a-concrete-type-from-a-trait-object
-// arc must be sync + send to be able to downcast  e.g.  Arc::downcast::<Scan>(plan)
+
 impl QueryPlanner {
-    pub fn create_physical_plan(plan: Arc<dyn LogicalPlan>) -> Arc<dyn PhysicalPlan> {
+    pub fn create_physical_plan(plan: &dyn LogicalPlan) -> Arc<dyn PhysicalPlan> {
         if let Some(scan) = plan.as_any().downcast_ref::<Scan>() {
             return Arc::new(ScanExec {
                 ds: scan.datasource.clone(),
                 projection: scan.projection.clone(),
             });
         }
-        if let Some(selection) = plan.as_any().downcast_ref::<Arc<Selection>>() {
-            let input = QueryPlanner::create_physical_plan(selection.clone());
+        if let Some(selection) = plan.as_any().downcast_ref::<Selection>() {
+            let input = QueryPlanner::create_physical_plan(selection.input.deref());
             let filter_expr =
-                Self::create_physical_expr(selection.expr.clone(), selection.input.clone());
+                Self::create_physical_expr(selection.expr.clone(), selection.input.deref());
             return Arc::new(SelectionExec {
                 input,
                 expr: filter_expr,
             });
         }
-        if let Some(projection) = plan.as_any().downcast_ref::<Arc<Projection>>() {
-            let input = QueryPlanner::create_physical_plan(projection.clone());
+        if let Some(projection) = plan.as_any().downcast_ref::<Projection>() {
+            let input = QueryPlanner::create_physical_plan(projection.input.deref());
             let projection_expr: Vec<Arc<dyn Expression>> = projection
                 .expr
                 .iter()
-                .map(|e| Self::create_physical_expr(e.clone(), projection.input.clone()))
+                .map(|e| Self::create_physical_expr(e.clone(), projection.input.deref()))
                 .collect();
 
             let projection_fields: Vec<Arc<Field>> = projection
@@ -58,17 +58,14 @@ impl QueryPlanner {
                 expr: projection_expr,
             });
         }
-        if let Some(aggregate) = plan.as_any().downcast_ref::<Arc<Projection>>() {
+        if let Some(aggregate) = plan.as_any().downcast_ref::<Aggregate>() {
             todo!()
         } else {
             panic!("not supported physical plan") // todo errorhandling
         }
     }
 
-    pub fn create_physical_expr(
-        expr: Arc<Expr>,
-        input: Arc<dyn LogicalPlan>,
-    ) -> Arc<dyn Expression> {
+    pub fn create_physical_expr(expr: Arc<Expr>, input: &dyn LogicalPlan) -> Arc<dyn Expression> {
         match &*expr {
             Expr::Column(col) => {
                 todo!()
