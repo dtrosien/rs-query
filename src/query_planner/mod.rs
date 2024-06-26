@@ -18,7 +18,7 @@ use std::sync::Arc;
 pub struct QueryPlanner;
 // if there is still a problem maybe look here:
 // https://stackoverflow.com/questions/33687447/how-to-get-a-reference-to-a-concrete-type-from-a-trait-object
-
+// arc must be sync + send to be able to downcast  e.g.  Arc::downcast::<Scan>(plan)
 impl QueryPlanner {
     pub fn create_physical_plan(plan: Arc<dyn LogicalPlan>) -> Arc<dyn PhysicalPlan> {
         if let Some(scan) = plan.as_any().downcast_ref::<Scan>() {
