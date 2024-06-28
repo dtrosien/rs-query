@@ -4,6 +4,6 @@ use std::sync::Arc;
 
 pub trait ColumnVector {
     fn get_type(&self) -> ArrowType;
-    fn get_value(&self, i: usize) -> Option<Arc<dyn Any>>;
+    fn get_value(&self, i: usize) -> Option<Arc<dyn Any>>; // todo probably sufficient to use only Option<&dyn Any>;
     fn size(&self) -> usize;
 }

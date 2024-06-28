@@ -1,5 +1,6 @@
 use crate::datatypes::schema::{Field, Schema};
 use crate::logical_plan::aggregate::Aggregate;
+use crate::logical_plan::expressions::binary_expr::{Base, BinaryExpr};
 use crate::logical_plan::expressions::literal_expr::LiteralExpr;
 use crate::logical_plan::expressions::Expr;
 use crate::logical_plan::logical_expr::LogicalExpr;
@@ -7,8 +8,10 @@ use crate::logical_plan::projection::Projection;
 use crate::logical_plan::scan::Scan;
 use crate::logical_plan::selection::Selection;
 use crate::logical_plan::LogicalPlan;
+use crate::physical_plan::expressions::boolean_expression::AndExpression;
 use crate::physical_plan::expressions::{
-    Expression, LiteralDoubleExpression, LiteralLongExpression, LiteralStringExpression,
+    Expression, LiteralDoubleExpression, LiteralFloatExpression, LiteralLongExpression,
+    LiteralStringExpression,
 };
 use crate::physical_plan::projection_exec::ProjectionExec;
 use crate::physical_plan::scan_exec::ScanExec;
@@ -83,7 +86,7 @@ impl QueryPlanner {
                     return Arc::new(LiteralLongExpression { value: l.i })
                 }
                 LiteralExpr::LiteralFloat(f) => {
-                    todo!()
+                    return Arc::new(LiteralFloatExpression { value: f.i })
                 }
                 LiteralExpr::LiteralDouble(d) => {
                     return Arc::new(LiteralDoubleExpression { value: d.i })
@@ -93,7 +96,18 @@ impl QueryPlanner {
                 todo!()
             }
             Expr::Binary(bin) => {
-                todo!()
+                let l = Self::create_physical_expr(bin.get_left().clone(), input);
+                let r = Self::create_physical_expr(bin.get_right().clone(), input);
+                match bin {
+                    BinaryExpr::And(_) => Arc::new(AndExpression { l, r }),
+                    BinaryExpr::Or(_) => Arc::new(AndExpression { l, r }),
+                    BinaryExpr::Eq(_) => Arc::new(AndExpression { l, r }),
+                    BinaryExpr::Neq(_) => Arc::new(AndExpression { l, r }),
+                    BinaryExpr::Gt(_) => Arc::new(AndExpression { l, r }),
+                    BinaryExpr::GtEq(_) => Arc::new(AndExpression { l, r }),
+                    BinaryExpr::Lt(_) => Arc::new(AndExpression { l, r }),
+                    BinaryExpr::LtEq(_) => Arc::new(AndExpression { l, r }),
+                }
             }
             Expr::Unary(unary) => {
                 todo!()

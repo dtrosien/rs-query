@@ -1,11 +1,11 @@
 use crate::datatypes::schema::Field;
+use crate::logical_plan::expressions::binary_expr::{Base, BinaryExprBase};
 use crate::logical_plan::expressions::Expr;
 use crate::logical_plan::logical_expr::LogicalExpr;
 use crate::logical_plan::LogicalPlan;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::sync::Arc;
-
 ////////////////////////////////////////////////////////////////////////////
 //// Math Expressions
 ////////////////////////////////////////////////////////////////////////////
@@ -41,6 +41,18 @@ impl LogicalExpr for MathExpr {
         }
     }
 }
+
+// impl Base for MathExpr{
+//     fn get_base(&self) -> &BinaryExprBase {
+//         match self{
+//             MathExpr::Add(m) => {m.base}
+//             MathExpr::Subtract(m) => {}
+//             MathExpr::Multiply(m) => {}
+//             MathExpr::Divide(m) => {}
+//             MathExpr::Modulus(m) => {}
+//         }
+//     }
+// }
 
 pub trait MathExprExt {
     fn add(self: Arc<Self>, rhs: Arc<Expr>) -> Arc<Expr>;

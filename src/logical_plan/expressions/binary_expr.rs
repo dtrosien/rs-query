@@ -7,9 +7,20 @@ use crate::datatypes::schema::Field;
 use crate::logical_plan::expressions::Expr;
 use crate::logical_plan::logical_expr::LogicalExpr;
 use crate::logical_plan::LogicalPlan;
+use arrow::compute::kernels::cmp::gt;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::sync::Arc;
+
+pub trait Base {
+    fn get_left(&self) -> Arc<Expr> {
+        self.get_base().l.clone()
+    }
+    fn get_right(&self) -> Arc<Expr> {
+        self.get_base().r.clone()
+    }
+    fn get_base(&self) -> &BinaryExprBase;
+}
 
 pub enum BinaryExpr {
     And(And),
@@ -33,6 +44,21 @@ impl Display for BinaryExpr {
             BinaryExpr::GtEq(b) => b.fmt(f),
             BinaryExpr::Lt(b) => b.fmt(f),
             BinaryExpr::LtEq(b) => b.fmt(f),
+        }
+    }
+}
+
+impl Base for BinaryExpr {
+    fn get_base(&self) -> &BinaryExprBase {
+        match self {
+            BinaryExpr::And(b) => &b.base.base,
+            BinaryExpr::Or(b) => &b.base.base,
+            BinaryExpr::Eq(b) => &b.base.base,
+            BinaryExpr::Neq(b) => &b.base.base,
+            BinaryExpr::Gt(b) => &b.base.base,
+            BinaryExpr::GtEq(b) => &b.base.base,
+            BinaryExpr::Lt(b) => &b.base.base,
+            BinaryExpr::LtEq(b) => &b.base.base,
         }
     }
 }
@@ -115,7 +141,7 @@ impl Display for BinaryExprBase {
 ////////////////////////////////////////////////////////////////////////////
 
 struct BooleanBinaryExpr {
-    base: BinaryExprBase,
+    pub base: BinaryExprBase,
 }
 
 impl BooleanBinaryExpr {

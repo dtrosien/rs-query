@@ -1,4 +1,6 @@
-mod column_expression;
+pub mod binary_expression;
+pub mod boolean_expression;
+pub mod column_expression;
 
 use crate::datatypes::arrow_types::ArrowType;
 use crate::datatypes::column_vector::ColumnVector;
@@ -32,6 +34,26 @@ impl Expression for LiteralLongExpression {
     fn evaluate(&self, input: &RecordBatch) -> Arc<dyn ColumnVector> {
         Arc::new(LiteralValueVector {
             arrow_type: ArrowType::Int64Type,
+            value: Some(Arc::new(self.value)),
+            size: input.row_count(),
+        })
+    }
+}
+
+pub struct LiteralFloatExpression {
+    pub value: f32,
+}
+
+impl Display for LiteralFloatExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
+
+impl Expression for LiteralFloatExpression {
+    fn evaluate(&self, input: &RecordBatch) -> Arc<dyn ColumnVector> {
+        Arc::new(LiteralValueVector {
+            arrow_type: ArrowType::FloatType,
             value: Some(Arc::new(self.value)),
             size: input.row_count(),
         })
