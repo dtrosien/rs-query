@@ -7,7 +7,7 @@ use std::sync::Arc;
 /// Reference column in a batch by index
 #[derive(Debug)]
 pub struct ColumnExpression {
-    i: usize,
+    pub i: usize,
 }
 
 impl Display for ColumnExpression {

@@ -13,6 +13,7 @@ use crate::physical_plan::expressions::boolean_expression::{
     AndExpression, EqExpression, GtEqExpression, GtExpression, LtEqExpression, LtExpression,
     NeqExpression, OrExpression,
 };
+use crate::physical_plan::expressions::column_expression::ColumnExpression;
 use crate::physical_plan::expressions::{
     Expression, LiteralDoubleExpression, LiteralFloatExpression, LiteralLongExpression,
     LiteralStringExpression,
@@ -75,26 +76,22 @@ impl QueryPlanner {
     pub fn create_physical_expr(expr: Arc<Expr>, input: &dyn LogicalPlan) -> Arc<dyn Expression> {
         match &*expr {
             Expr::Column(col) => {
-                todo!()
+                let i = input
+                    .schema()
+                    .fields
+                    .iter()
+                    .position(|f| f.name.eq(&col.name))
+                    .expect(format!("No column with name {}", col.name).as_str());
+                Arc::new(ColumnExpression { i })
             }
-            Expr::ColumnIndex(col_index) => {
-                todo!()
-            }
+            Expr::ColumnIndex(col_index) => Arc::new(ColumnExpression { i: col_index.i }),
             Expr::Literal(lit) => match lit {
-                LiteralExpr::LiteralString(s) => {
-                    return Arc::new(LiteralStringExpression {
-                        value: s.str.clone(),
-                    })
-                }
-                LiteralExpr::LiteralLong(l) => {
-                    return Arc::new(LiteralLongExpression { value: l.i })
-                }
-                LiteralExpr::LiteralFloat(f) => {
-                    return Arc::new(LiteralFloatExpression { value: f.i })
-                }
-                LiteralExpr::LiteralDouble(d) => {
-                    return Arc::new(LiteralDoubleExpression { value: d.i })
-                }
+                LiteralExpr::LiteralString(s) => Arc::new(LiteralStringExpression {
+                    value: s.str.clone(),
+                }),
+                LiteralExpr::LiteralLong(l) => Arc::new(LiteralLongExpression { value: l.i }),
+                LiteralExpr::LiteralFloat(f) => Arc::new(LiteralFloatExpression { value: f.i }),
+                LiteralExpr::LiteralDouble(d) => Arc::new(LiteralDoubleExpression { value: d.i }),
             },
             Expr::Cast(cast) => {
                 todo!()
@@ -144,7 +141,7 @@ impl QueryPlanner {
                 // note that there is no physical expression for an alias since the alias
                 // only affects the name using in the planning phase and not how the aliased
                 // expression is executed
-                todo!()
+                Self::create_physical_expr(alias.expr.clone(), input)
             }
         }
     }

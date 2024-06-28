@@ -98,7 +98,7 @@ impl LogicalExpr for Column {
 
 /// Logical expression representing a reference to a column by index.
 pub struct ColumnIndex {
-    i: usize,
+    pub i: usize,
 }
 
 impl Display for ColumnIndex {
@@ -160,8 +160,8 @@ impl LogicalExpr for CastExpr {
 
 /// Aliased expression e.g. `expr.alias`.
 pub struct Alias {
-    expr: Arc<Expr>,
-    alias: String,
+    pub expr: Arc<Expr>,
+    pub alias: String,
 }
 
 /// Convenience method to create a Alias
@@ -173,7 +173,7 @@ pub fn alias(expr: Arc<Expr>, alias: impl Into<String>) -> Arc<Expr> {
 }
 
 impl Alias {
-    pub(crate) fn new(expr: Arc<Expr>, alias: String) -> Self {
+    pub fn new(expr: Arc<Expr>, alias: String) -> Self {
         Self { expr, alias }
     }
 }

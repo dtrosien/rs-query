@@ -16,7 +16,6 @@ path = "src/main.rs"
 
 [dependencies]
 arrow = "52.0.0"
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 config = "0.14.0"
 tracing = { version = "0.1", features = ["log"] }
 csv = "1.3.0"

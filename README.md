@@ -6,8 +6,8 @@ An educational query engine project based on:
 
 ## To-Do List
 
-- [ ] next steps: finish and test query planner, dann expressions checken und evtl ueberarbeiten + fertig machen
-- [ ] think about how to implement physical Expressions hierarchy
+- [ ] next steps: finish and test query planner
+- [ ] think about how to implement aggregate Expressions (hierarchy)
 - [ ] write tests for physical plans
 - [ ] write test data (RecordBatches etc) generator or use a crate like fake or quickcheck for that
 - [ ] impl Optimizer
