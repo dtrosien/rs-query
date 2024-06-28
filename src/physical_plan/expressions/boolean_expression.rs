@@ -16,7 +16,7 @@ pub trait BooleanExpression: Expression {
     fn evaluate(&self, input: &RecordBatch) -> Arc<dyn ColumnVector> {
         let ll = self.l_expr().evaluate(input);
         let rr = self.r_expr().evaluate(input);
-        assert_eq!(ll.size(), rr.size());
+        assert_eq!(ll.size(), rr.size(), "different vector length");
         if ll.get_type() != rr.get_type() {
             panic!(
                 "Cannot compare values of different type: {:?} != {:?}",
