@@ -132,8 +132,8 @@ impl AliasExprExt for Expr {
 
 /// Logical expression representing a cast of datatypes
 pub struct CastExpr {
-    expr: Arc<Expr>,
-    data_type: ArrowType,
+    pub expr: Arc<Expr>,
+    pub data_type: ArrowType,
 }
 
 /// Convenience method to create a CastExpr

@@ -13,6 +13,7 @@ use crate::physical_plan::expressions::boolean_expression::{
     AndExpression, EqExpression, GtEqExpression, GtExpression, LtEqExpression, LtExpression,
     NeqExpression, OrExpression,
 };
+use crate::physical_plan::expressions::cast_expression::CastExpression;
 use crate::physical_plan::expressions::column_expression::ColumnExpression;
 use crate::physical_plan::expressions::{
     Expression, LiteralDoubleExpression, LiteralFloatExpression, LiteralLongExpression,
@@ -69,7 +70,7 @@ impl QueryPlanner {
         if let Some(aggregate) = plan.as_any().downcast_ref::<Aggregate>() {
             todo!()
         } else {
-            panic!("not supported physical plan") // todo errorhandling
+            panic!("not supported physical plan")
         }
     }
 
@@ -94,7 +95,11 @@ impl QueryPlanner {
                 LiteralExpr::LiteralDouble(d) => Arc::new(LiteralDoubleExpression { value: d.i }),
             },
             Expr::Cast(cast) => {
-                todo!()
+                let expr = Self::create_physical_expr(cast.expr.clone(), input);
+                Arc::new(CastExpression {
+                    expr,
+                    data_type: cast.data_type.clone(),
+                })
             }
             Expr::Binary(bin) => {
                 let l = Self::create_physical_expr(bin.get_left().clone(), input);
