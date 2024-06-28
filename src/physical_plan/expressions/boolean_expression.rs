@@ -258,7 +258,7 @@ impl BooleanExpression for LtExpression {
 
 ////////////////////////////////////////////////////////////////////////////
 
-struct LtEqExpression {
+pub struct LtEqExpression {
     pub l: Arc<dyn Expression>,
     pub r: Arc<dyn Expression>,
 }
@@ -307,7 +307,7 @@ impl BooleanExpression for LtEqExpression {
 
 ////////////////////////////////////////////////////////////////////////////
 
-struct GtExpression {
+pub struct GtExpression {
     pub l: Arc<dyn Expression>,
     pub r: Arc<dyn Expression>,
 }
@@ -356,7 +356,7 @@ impl BooleanExpression for GtExpression {
 
 ////////////////////////////////////////////////////////////////////////////
 
-struct GtEqExpression {
+pub struct GtEqExpression {
     pub l: Arc<dyn Expression>,
     pub r: Arc<dyn Expression>,
 }

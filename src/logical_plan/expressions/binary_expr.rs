@@ -114,14 +114,14 @@ impl BooleanBinaryExprExt for Expr {
 }
 
 pub struct BinaryExprBase {
-    name: String,
-    op: String,
-    l: Arc<Expr>,
-    r: Arc<Expr>,
+    pub name: String,
+    pub op: String,
+    pub l: Arc<Expr>,
+    pub r: Arc<Expr>,
 }
 
 impl BinaryExprBase {
-    fn new(name: String, op: String, l: Arc<Expr>, r: Arc<Expr>) -> Self {
+    pub(crate) fn new(name: String, op: String, l: Arc<Expr>, r: Arc<Expr>) -> Self {
         Self { name, op, l, r }
     }
 }

@@ -42,17 +42,17 @@ impl LogicalExpr for MathExpr {
     }
 }
 
-// impl Base for MathExpr{
-//     fn get_base(&self) -> &BinaryExprBase {
-//         match self{
-//             MathExpr::Add(m) => {m.base}
-//             MathExpr::Subtract(m) => {}
-//             MathExpr::Multiply(m) => {}
-//             MathExpr::Divide(m) => {}
-//             MathExpr::Modulus(m) => {}
-//         }
-//     }
-// }
+impl Base for MathExpr {
+    fn get_base(&self) -> &BinaryExprBase {
+        match self {
+            MathExpr::Add(m) => &m.base,
+            MathExpr::Subtract(m) => &m.base,
+            MathExpr::Multiply(m) => &m.base,
+            MathExpr::Divide(m) => &m.base,
+            MathExpr::Modulus(m) => &m.base,
+        }
+    }
+}
 
 pub trait MathExprExt {
     fn add(self: Arc<Self>, rhs: Arc<Expr>) -> Arc<Expr>;
@@ -84,20 +84,7 @@ impl MathExprExt for Expr {
     }
 }
 
-pub struct MathExprBase {
-    name: String,
-    op: String,
-    l: Arc<Expr>,
-    r: Arc<Expr>,
-}
-
-impl MathExprBase {
-    fn new(name: String, op: String, l: Arc<Expr>, r: Arc<Expr>) -> Self {
-        Self { name, op, l, r }
-    }
-}
-
-impl LogicalExpr for MathExprBase {
+impl LogicalExpr for BinaryExprBase {
     fn to_field(&self, input: Arc<dyn LogicalPlan>) -> anyhow::Result<Arc<Field>> {
         Ok(Arc::from(Field {
             name: self.name.clone(),
@@ -106,28 +93,16 @@ impl LogicalExpr for MathExprBase {
     }
 }
 
-impl Display for MathExprBase {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{} {} {}",
-            self.l.to_string(),
-            self.op,
-            self.r.to_string()
-        )
-    }
-}
-
 ////////////////////////////////////////////////////////////////////////////
 
 pub struct Add {
-    base: MathExprBase,
+    base: BinaryExprBase,
 }
 
 impl Add {
     pub(crate) fn new(l: Arc<Expr>, r: Arc<Expr>) -> Self {
         Self {
-            base: MathExprBase::new("add".to_string(), "+".to_string(), l, r),
+            base: BinaryExprBase::new("add".to_string(), "+".to_string(), l, r),
         }
     }
 }
@@ -147,13 +122,13 @@ impl Display for Add {
 ////////////////////////////////////////////////////////////////////////////
 
 pub struct Subtract {
-    base: MathExprBase,
+    base: BinaryExprBase,
 }
 
 impl Subtract {
     pub(crate) fn new(l: Arc<Expr>, r: Arc<Expr>) -> Self {
         Self {
-            base: MathExprBase::new("subtract".to_string(), "-".to_string(), l, r),
+            base: BinaryExprBase::new("subtract".to_string(), "-".to_string(), l, r),
         }
     }
 }
@@ -173,13 +148,13 @@ impl Display for Subtract {
 ////////////////////////////////////////////////////////////////////////////
 
 pub struct Multiply {
-    base: MathExprBase,
+    base: BinaryExprBase,
 }
 
 impl Multiply {
     pub(crate) fn new(l: Arc<Expr>, r: Arc<Expr>) -> Self {
         Self {
-            base: MathExprBase::new("mult".to_string(), "*".to_string(), l, r),
+            base: BinaryExprBase::new("mult".to_string(), "*".to_string(), l, r),
         }
     }
 }
@@ -199,13 +174,13 @@ impl Display for Multiply {
 ////////////////////////////////////////////////////////////////////////////
 
 pub struct Divide {
-    pub base: MathExprBase,
+    pub base: BinaryExprBase,
 }
 
 impl Divide {
     pub(crate) fn new(l: Arc<Expr>, r: Arc<Expr>) -> Self {
         Self {
-            base: MathExprBase::new("div".to_string(), "/".to_string(), l, r),
+            base: BinaryExprBase::new("div".to_string(), "/".to_string(), l, r),
         }
     }
 }
@@ -225,13 +200,13 @@ impl Display for Divide {
 ////////////////////////////////////////////////////////////////////////////
 
 pub struct Modulus {
-    base: MathExprBase,
+    base: BinaryExprBase,
 }
 
 impl Modulus {
     pub(crate) fn new(l: Arc<Expr>, r: Arc<Expr>) -> Self {
         Self {
-            base: MathExprBase::new("mod".to_string(), "%".to_string(), l, r),
+            base: BinaryExprBase::new("mod".to_string(), "%".to_string(), l, r),
         }
     }
 }

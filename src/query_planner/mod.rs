@@ -2,13 +2,17 @@ use crate::datatypes::schema::{Field, Schema};
 use crate::logical_plan::aggregate::Aggregate;
 use crate::logical_plan::expressions::binary_expr::{Base, BinaryExpr};
 use crate::logical_plan::expressions::literal_expr::LiteralExpr;
+use crate::logical_plan::expressions::math_expr::MathExpr;
 use crate::logical_plan::expressions::Expr;
 use crate::logical_plan::logical_expr::LogicalExpr;
 use crate::logical_plan::projection::Projection;
 use crate::logical_plan::scan::Scan;
 use crate::logical_plan::selection::Selection;
 use crate::logical_plan::LogicalPlan;
-use crate::physical_plan::expressions::boolean_expression::AndExpression;
+use crate::physical_plan::expressions::boolean_expression::{
+    AndExpression, EqExpression, GtEqExpression, GtExpression, LtEqExpression, LtExpression,
+    NeqExpression, OrExpression,
+};
 use crate::physical_plan::expressions::{
     Expression, LiteralDoubleExpression, LiteralFloatExpression, LiteralLongExpression,
     LiteralStringExpression,
@@ -99,21 +103,39 @@ impl QueryPlanner {
                 let l = Self::create_physical_expr(bin.get_left().clone(), input);
                 let r = Self::create_physical_expr(bin.get_right().clone(), input);
                 match bin {
-                    BinaryExpr::And(_) => Arc::new(AndExpression { l, r }),
-                    BinaryExpr::Or(_) => Arc::new(AndExpression { l, r }),
-                    BinaryExpr::Eq(_) => Arc::new(AndExpression { l, r }),
-                    BinaryExpr::Neq(_) => Arc::new(AndExpression { l, r }),
-                    BinaryExpr::Gt(_) => Arc::new(AndExpression { l, r }),
-                    BinaryExpr::GtEq(_) => Arc::new(AndExpression { l, r }),
-                    BinaryExpr::Lt(_) => Arc::new(AndExpression { l, r }),
-                    BinaryExpr::LtEq(_) => Arc::new(AndExpression { l, r }),
+                    BinaryExpr::And(a) => Arc::new(AndExpression { l, r }),
+                    BinaryExpr::Or(_) => Arc::new(OrExpression { l, r }),
+                    BinaryExpr::Eq(_) => Arc::new(EqExpression { l, r }),
+                    BinaryExpr::Neq(_) => Arc::new(NeqExpression { l, r }),
+                    BinaryExpr::Gt(_) => Arc::new(GtExpression { l, r }),
+                    BinaryExpr::GtEq(_) => Arc::new(GtEqExpression { l, r }),
+                    BinaryExpr::Lt(_) => Arc::new(LtExpression { l, r }),
+                    BinaryExpr::LtEq(_) => Arc::new(LtEqExpression { l, r }),
                 }
             }
             Expr::Unary(unary) => {
                 todo!()
             }
             Expr::Math(math) => {
-                todo!()
+                let l = Self::create_physical_expr(math.get_left().clone(), input);
+                let r = Self::create_physical_expr(math.get_right().clone(), input);
+                match math {
+                    MathExpr::Add(_) => {
+                        todo!()
+                    }
+                    MathExpr::Subtract(_) => {
+                        todo!()
+                    }
+                    MathExpr::Multiply(_) => {
+                        todo!()
+                    }
+                    MathExpr::Divide(_) => {
+                        todo!()
+                    }
+                    MathExpr::Modulus(_) => {
+                        todo!()
+                    }
+                }
             }
             Expr::Aggr(aggr) => {
                 todo!()
