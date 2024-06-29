@@ -128,3 +128,273 @@ impl MathExpression for AddExpression {
 }
 
 ////////////////////////////////////////////////////////////////////////////
+
+pub struct SubtractExpression {
+    pub l: Arc<dyn Expression>,
+    pub r: Arc<dyn Expression>,
+}
+
+impl BinaryExpression for SubtractExpression {
+    fn l_expr(&self) -> Arc<dyn Expression> {
+        self.l.clone()
+    }
+
+    fn r_expr(&self) -> Arc<dyn Expression> {
+        self.r.clone()
+    }
+
+    fn evaluate_binary(
+        &self,
+        l: Arc<dyn ColumnVector>,
+        r: Arc<dyn ColumnVector>,
+    ) -> Arc<dyn ColumnVector> {
+        MathExpression::evaluate_binary(self, l, r)
+    }
+}
+
+impl Expression for SubtractExpression {
+    fn evaluate(&self, input: &RecordBatch) -> Arc<dyn ColumnVector> {
+        BinaryExpression::evaluate(self, input)
+    }
+}
+
+impl Display for SubtractExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}-{}", self.l.to_string(), self.r.to_string())
+    }
+}
+
+impl MathExpression for SubtractExpression {
+    fn evaluate_math_op(
+        &self,
+        l: &dyn Any,
+        r: &dyn Any,
+        arrow_type: ArrowType,
+    ) -> Option<Arc<dyn Any>> {
+        match arrow_type {
+            ArrowType::Int8Type => l.downcast_ref::<i8>().and_then(|l| {
+                r.downcast_ref::<i8>()
+                    .map(|r| Arc::new(l - r) as Arc<dyn Any>)
+            }),
+            ArrowType::Int16Type => l.downcast_ref::<i16>().and_then(|l| {
+                r.downcast_ref::<i16>()
+                    .map(|r| Arc::new(l - r) as Arc<dyn Any>)
+            }),
+            ArrowType::Int32Type => l.downcast_ref::<i32>().and_then(|l| {
+                r.downcast_ref::<i32>()
+                    .map(|r| Arc::new(l - r) as Arc<dyn Any>)
+            }),
+            ArrowType::Int64Type => l.downcast_ref::<i64>().and_then(|l| {
+                r.downcast_ref::<i64>()
+                    .map(|r| Arc::new(l - r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt8Type => l.downcast_ref::<u8>().and_then(|l| {
+                r.downcast_ref::<u8>()
+                    .map(|r| Arc::new(l - r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt16Type => l.downcast_ref::<u16>().and_then(|l| {
+                r.downcast_ref::<u16>()
+                    .map(|r| Arc::new(l - r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt32Type => l.downcast_ref::<u32>().and_then(|l| {
+                r.downcast_ref::<u32>()
+                    .map(|r| Arc::new(l - r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt64Type => l.downcast_ref::<u64>().and_then(|l| {
+                r.downcast_ref::<u64>()
+                    .map(|r| Arc::new(l - r) as Arc<dyn Any>)
+            }),
+            ArrowType::FloatType => l.downcast_ref::<f32>().and_then(|l| {
+                r.downcast_ref::<f32>()
+                    .map(|r| Arc::new(l - r) as Arc<dyn Any>)
+            }),
+            ArrowType::DoubleType => l.downcast_ref::<f64>().and_then(|l| {
+                r.downcast_ref::<f64>()
+                    .map(|r| Arc::new(l - r) as Arc<dyn Any>)
+            }),
+            _ => panic!("Unsupported data type in math expression: {:?}", arrow_type),
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+pub struct MultiplyExpression {
+    pub l: Arc<dyn Expression>,
+    pub r: Arc<dyn Expression>,
+}
+
+impl BinaryExpression for MultiplyExpression {
+    fn l_expr(&self) -> Arc<dyn Expression> {
+        self.l.clone()
+    }
+
+    fn r_expr(&self) -> Arc<dyn Expression> {
+        self.r.clone()
+    }
+
+    fn evaluate_binary(
+        &self,
+        l: Arc<dyn ColumnVector>,
+        r: Arc<dyn ColumnVector>,
+    ) -> Arc<dyn ColumnVector> {
+        MathExpression::evaluate_binary(self, l, r)
+    }
+}
+
+impl Expression for MultiplyExpression {
+    fn evaluate(&self, input: &RecordBatch) -> Arc<dyn ColumnVector> {
+        BinaryExpression::evaluate(self, input)
+    }
+}
+
+impl Display for MultiplyExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}*{}", self.l.to_string(), self.r.to_string())
+    }
+}
+
+impl MathExpression for MultiplyExpression {
+    fn evaluate_math_op(
+        &self,
+        l: &dyn Any,
+        r: &dyn Any,
+        arrow_type: ArrowType,
+    ) -> Option<Arc<dyn Any>> {
+        match arrow_type {
+            ArrowType::Int8Type => l.downcast_ref::<i8>().and_then(|l| {
+                r.downcast_ref::<i8>()
+                    .map(|r| Arc::new(l * r) as Arc<dyn Any>)
+            }),
+            ArrowType::Int16Type => l.downcast_ref::<i16>().and_then(|l| {
+                r.downcast_ref::<i16>()
+                    .map(|r| Arc::new(l * r) as Arc<dyn Any>)
+            }),
+            ArrowType::Int32Type => l.downcast_ref::<i32>().and_then(|l| {
+                r.downcast_ref::<i32>()
+                    .map(|r| Arc::new(l * r) as Arc<dyn Any>)
+            }),
+            ArrowType::Int64Type => l.downcast_ref::<i64>().and_then(|l| {
+                r.downcast_ref::<i64>()
+                    .map(|r| Arc::new(l * r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt8Type => l.downcast_ref::<u8>().and_then(|l| {
+                r.downcast_ref::<u8>()
+                    .map(|r| Arc::new(l * r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt16Type => l.downcast_ref::<u16>().and_then(|l| {
+                r.downcast_ref::<u16>()
+                    .map(|r| Arc::new(l * r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt32Type => l.downcast_ref::<u32>().and_then(|l| {
+                r.downcast_ref::<u32>()
+                    .map(|r| Arc::new(l * r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt64Type => l.downcast_ref::<u64>().and_then(|l| {
+                r.downcast_ref::<u64>()
+                    .map(|r| Arc::new(l * r) as Arc<dyn Any>)
+            }),
+            ArrowType::FloatType => l.downcast_ref::<f32>().and_then(|l| {
+                r.downcast_ref::<f32>()
+                    .map(|r| Arc::new(l * r) as Arc<dyn Any>)
+            }),
+            ArrowType::DoubleType => l.downcast_ref::<f64>().and_then(|l| {
+                r.downcast_ref::<f64>()
+                    .map(|r| Arc::new(l * r) as Arc<dyn Any>)
+            }),
+            _ => panic!("Unsupported data type in math expression: {:?}", arrow_type),
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+pub struct DivideExpression {
+    pub l: Arc<dyn Expression>,
+    pub r: Arc<dyn Expression>,
+}
+
+impl BinaryExpression for DivideExpression {
+    fn l_expr(&self) -> Arc<dyn Expression> {
+        self.l.clone()
+    }
+
+    fn r_expr(&self) -> Arc<dyn Expression> {
+        self.r.clone()
+    }
+
+    fn evaluate_binary(
+        &self,
+        l: Arc<dyn ColumnVector>,
+        r: Arc<dyn ColumnVector>,
+    ) -> Arc<dyn ColumnVector> {
+        MathExpression::evaluate_binary(self, l, r)
+    }
+}
+
+impl Expression for DivideExpression {
+    fn evaluate(&self, input: &RecordBatch) -> Arc<dyn ColumnVector> {
+        BinaryExpression::evaluate(self, input)
+    }
+}
+
+impl Display for DivideExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}/{}", self.l.to_string(), self.r.to_string())
+    }
+}
+
+impl MathExpression for DivideExpression {
+    fn evaluate_math_op(
+        &self,
+        l: &dyn Any,
+        r: &dyn Any,
+        arrow_type: ArrowType,
+    ) -> Option<Arc<dyn Any>> {
+        match arrow_type {
+            ArrowType::Int8Type => l.downcast_ref::<i8>().and_then(|l| {
+                r.downcast_ref::<i8>()
+                    .map(|r| Arc::new(l / r) as Arc<dyn Any>)
+            }),
+            ArrowType::Int16Type => l.downcast_ref::<i16>().and_then(|l| {
+                r.downcast_ref::<i16>()
+                    .map(|r| Arc::new(l / r) as Arc<dyn Any>)
+            }),
+            ArrowType::Int32Type => l.downcast_ref::<i32>().and_then(|l| {
+                r.downcast_ref::<i32>()
+                    .map(|r| Arc::new(l / r) as Arc<dyn Any>)
+            }),
+            ArrowType::Int64Type => l.downcast_ref::<i64>().and_then(|l| {
+                r.downcast_ref::<i64>()
+                    .map(|r| Arc::new(l / r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt8Type => l.downcast_ref::<u8>().and_then(|l| {
+                r.downcast_ref::<u8>()
+                    .map(|r| Arc::new(l / r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt16Type => l.downcast_ref::<u16>().and_then(|l| {
+                r.downcast_ref::<u16>()
+                    .map(|r| Arc::new(l / r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt32Type => l.downcast_ref::<u32>().and_then(|l| {
+                r.downcast_ref::<u32>()
+                    .map(|r| Arc::new(l / r) as Arc<dyn Any>)
+            }),
+            ArrowType::UInt64Type => l.downcast_ref::<u64>().and_then(|l| {
+                r.downcast_ref::<u64>()
+                    .map(|r| Arc::new(l / r) as Arc<dyn Any>)
+            }),
+            ArrowType::FloatType => l.downcast_ref::<f32>().and_then(|l| {
+                r.downcast_ref::<f32>()
+                    .map(|r| Arc::new(l / r) as Arc<dyn Any>)
+            }),
+            ArrowType::DoubleType => l.downcast_ref::<f64>().and_then(|l| {
+                r.downcast_ref::<f64>()
+                    .map(|r| Arc::new(l / r) as Arc<dyn Any>)
+            }),
+            _ => panic!("Unsupported data type in math expression: {:?}", arrow_type),
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////
