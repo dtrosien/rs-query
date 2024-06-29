@@ -2,6 +2,7 @@ pub mod binary_expression;
 pub mod boolean_expression;
 pub mod cast_expression;
 pub mod column_expression;
+pub mod math_expression;
 
 use crate::datatypes::arrow_types::ArrowType;
 use crate::datatypes::column_vector::ColumnVector;
