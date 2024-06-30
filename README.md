@@ -6,8 +6,8 @@ An educational query engine project based on:
 
 ## To-Do List
 
-- [ ] next steps: finish and test query planner
-- [ ] think about how to implement aggregate Expressions (hierarchy)
+- [ ] implement aggregate Expressions
+- [ ] use asserts for int tests
 - [ ] write tests for physical plans
 - [ ] write test data (RecordBatches etc) generator or use a crate like fake or quickcheck for that
 - [ ] short functions for logical expr of Or + And

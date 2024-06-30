@@ -16,7 +16,7 @@ use crate::physical_plan::expressions::boolean_expression::{
 use crate::physical_plan::expressions::cast_expression::CastExpression;
 use crate::physical_plan::expressions::column_expression::ColumnExpression;
 use crate::physical_plan::expressions::math_expression::{
-    AddExpression, DivideExpression, MultiplyExpression, SubtractExpression,
+    AddExpression, DivideExpression, ModulusExpression, MultiplyExpression, SubtractExpression,
 };
 use crate::physical_plan::expressions::{
     Expression, LiteralDoubleExpression, LiteralFloatExpression, LiteralLongExpression,
@@ -129,9 +129,7 @@ impl QueryPlanner {
                     MathExpr::Subtract(_) => Arc::new(SubtractExpression { l, r }),
                     MathExpr::Multiply(_) => Arc::new(MultiplyExpression { l, r }),
                     MathExpr::Divide(_) => Arc::new(DivideExpression { l, r }),
-                    MathExpr::Modulus(_) => {
-                        todo!()
-                    }
+                    MathExpr::Modulus(_) => Arc::new(ModulusExpression { l, r }),
                 }
             }
             Expr::Aggr(aggr) => {
