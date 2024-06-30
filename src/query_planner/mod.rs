@@ -108,7 +108,7 @@ impl QueryPlanner {
                 let l = Self::create_physical_expr(bin.get_left().clone(), input);
                 let r = Self::create_physical_expr(bin.get_right().clone(), input);
                 match bin {
-                    BinaryExpr::And(a) => Arc::new(AndExpression { l, r }),
+                    BinaryExpr::And(_) => Arc::new(AndExpression { l, r }),
                     BinaryExpr::Or(_) => Arc::new(OrExpression { l, r }),
                     BinaryExpr::Eq(_) => Arc::new(EqExpression { l, r }),
                     BinaryExpr::Neq(_) => Arc::new(NeqExpression { l, r }),

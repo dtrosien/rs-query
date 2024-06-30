@@ -1,6 +1,6 @@
 use rquery::datatypes::arrow_types::ArrowType;
 use rquery::execution::ExecutionContext;
-use rquery::logical_plan::expressions::binary_expr::BooleanBinaryExprExt;
+use rquery::logical_plan::expressions::binary_expr::{and, or, BooleanBinaryExprExt};
 use rquery::logical_plan::expressions::literal_expr::{lit_double, lit_long, lit_str};
 use rquery::logical_plan::expressions::math_expr::MathExprExt;
 use rquery::logical_plan::expressions::{alias, cast, col};
@@ -8,7 +8,6 @@ use rquery::logical_plan::LogicalPlanPrinter;
 use std::any::Any;
 use std::collections::HashMap;
 use std::ops::Deref;
-use std::sync::Arc;
 
 mod common;
 #[test]
@@ -33,6 +32,44 @@ fn test_filter_from_csv() {
     let df = ctx
         .csv("testdata/employee.csv", true)
         .filter(col("state").eq(lit_str("CO")))
+        .project(vec![alias(col("last_name"), "name"), col("first_name")]);
+
+    println!("{}", df.clone().logical_plan().pretty());
+    let r = ctx.execute(df).for_each(|result| {
+        let result_str = result.show().unwrap();
+        print!("{result_str}");
+    });
+}
+
+#[test]
+fn test_filter_or_from_csv() {
+    let ctx = ExecutionContext::new(HashMap::default());
+
+    let df = ctx
+        .csv("testdata/employee.csv", true)
+        .filter(or(
+            col("state").eq(lit_str("CO")),
+            col("state").eq(lit_str("CA")),
+        ))
+        .project(vec![alias(col("last_name"), "name"), col("first_name")]);
+
+    println!("{}", df.clone().logical_plan().pretty());
+    let r = ctx.execute(df).for_each(|result| {
+        let result_str = result.show().unwrap();
+        print!("{result_str}");
+    });
+}
+
+#[test]
+fn test_filter_and_from_csv() {
+    let ctx = ExecutionContext::new(HashMap::default());
+
+    let df = ctx
+        .csv("testdata/employee.csv", true)
+        .filter(and(
+            col("state").eq(lit_str("CO")),
+            cast(col("salary"), ArrowType::Int64Type).eq(lit_long(11500)),
+        ))
         .project(vec![alias(col("last_name"), "name"), col("first_name")]);
 
     println!("{}", df.clone().logical_plan().pretty());

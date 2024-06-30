@@ -173,6 +173,11 @@ pub struct And {
     base: BooleanBinaryExpr,
 }
 
+/// Convenience method to create an And
+pub fn and(l: Arc<Expr>, r: Arc<Expr>) -> Arc<Expr> {
+    Arc::new(Expr::Binary(BinaryExpr::And(And::new(l, r))))
+}
+
 impl And {
     fn new(l: Arc<Expr>, r: Arc<Expr>) -> Self {
         Self {
@@ -197,6 +202,11 @@ impl Display for And {
 
 pub struct Or {
     base: BooleanBinaryExpr,
+}
+
+/// Convenience method to create an Or
+pub fn or(l: Arc<Expr>, r: Arc<Expr>) -> Arc<Expr> {
+    Arc::new(Expr::Binary(BinaryExpr::Or(Or::new(l, r))))
 }
 
 impl Or {
