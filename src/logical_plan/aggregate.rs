@@ -8,9 +8,9 @@ use std::fmt::Display;
 use std::sync::Arc;
 
 pub struct Aggregate {
-    input: Arc<dyn LogicalPlan>,
-    group_expr: Vec<Arc<Expr>>,
-    aggregate_expr: Vec<Arc<Expr>>, // todo use exlicit AggrExpr (or impl trait) if a better solution for expr chaining is found
+    pub input: Arc<dyn LogicalPlan>,
+    pub group_expr: Vec<Arc<Expr>>,
+    pub aggregate_expr: Vec<Arc<Expr>>, // todo use exlicit AggrExpr (or impl trait) if a better solution for expr chaining is found
 }
 
 impl Aggregate {

@@ -86,7 +86,7 @@ impl RecordBatch {
         Some(csv)
     }
 
-    fn value_to_string(any_value: Arc<dyn Any>, data_type: &ArrowType) -> Option<String> {
+    pub fn value_to_string(any_value: Arc<dyn Any>, data_type: &ArrowType) -> Option<String> {
         match data_type {
             ArrowType::BooleanType => any_value.downcast_ref::<bool>().map(|v| v.to_string()),
             ArrowType::Int8Type => any_value.downcast_ref::<i8>().map(|v| v.to_string()),

@@ -1,5 +1,6 @@
 use crate::datatypes::schema::{Field, Schema};
 use crate::logical_plan::aggregate::Aggregate;
+use crate::logical_plan::expressions::aggr_expr::AggrExpr;
 use crate::logical_plan::expressions::binary_expr::{Base, BinaryExpr};
 use crate::logical_plan::expressions::literal_expr::LiteralExpr;
 use crate::logical_plan::expressions::math_expr::MathExpr;
@@ -9,6 +10,7 @@ use crate::logical_plan::projection::Projection;
 use crate::logical_plan::scan::Scan;
 use crate::logical_plan::selection::Selection;
 use crate::logical_plan::LogicalPlan;
+use crate::physical_plan::expressions::aggregate_expression::AggregateExpression;
 use crate::physical_plan::expressions::boolean_expression::{
     AndExpression, EqExpression, GtEqExpression, GtExpression, LtEqExpression, LtExpression,
     NeqExpression, OrExpression,
@@ -18,10 +20,12 @@ use crate::physical_plan::expressions::column_expression::ColumnExpression;
 use crate::physical_plan::expressions::math_expression::{
     AddExpression, DivideExpression, ModulusExpression, MultiplyExpression, SubtractExpression,
 };
+use crate::physical_plan::expressions::sum_expression::SumExpression;
 use crate::physical_plan::expressions::{
     Expression, LiteralDoubleExpression, LiteralFloatExpression, LiteralLongExpression,
     LiteralStringExpression,
 };
+use crate::physical_plan::hash_aggregate_exec::HashAggregateExec;
 use crate::physical_plan::projection_exec::ProjectionExec;
 use crate::physical_plan::scan_exec::ScanExec;
 use crate::physical_plan::selection_exec::SelectionExec;
@@ -71,7 +75,54 @@ impl QueryPlanner {
             });
         }
         if let Some(aggregate) = plan.as_any().downcast_ref::<Aggregate>() {
-            todo!()
+            let input = QueryPlanner::create_physical_plan(aggregate.input.deref());
+            let group_expr: Vec<Arc<dyn Expression>> = aggregate
+                .group_expr
+                .iter()
+                .map(|e| Self::create_physical_expr(e.clone(), aggregate.input.deref()))
+                .collect();
+            let aggregate_expr: Vec<Arc<dyn AggregateExpression>> = aggregate
+                .aggregate_expr
+                .iter()
+                .map(|e| {
+                    match e.deref() {
+                        Expr::Aggr(AggrExpr::Sum(sum)) => Arc::new(SumExpression {
+                            expr: Self::create_physical_expr(
+                                sum.base.expr.clone(),
+                                aggregate.input.deref(),
+                            ),
+                        })
+                            as Arc<dyn AggregateExpression>,
+
+                        Expr::Aggr(AggrExpr::Max(max)) => Arc::new(SumExpression {
+                            // todo exchange with max
+                            expr: Self::create_physical_expr(
+                                max.base.expr.clone(),
+                                aggregate.input.deref(),
+                            ),
+                        })
+                            as Arc<dyn AggregateExpression>,
+
+                        Expr::Aggr(AggrExpr::Min(min)) => Arc::new(SumExpression {
+                            // todo exchange with min
+                            expr: Self::create_physical_expr(
+                                min.base.expr.clone(),
+                                aggregate.input.deref(),
+                            ),
+                        })
+                            as Arc<dyn AggregateExpression>,
+
+                        _ => panic!("NOT SUPPORTED AGGREGATE"),
+                    }
+                })
+                .collect();
+
+            return Arc::new(HashAggregateExec {
+                input,
+                group_expr,
+                aggregate_expr,
+                schema: aggregate.schema(),
+            });
         } else {
             panic!("not supported physical plan")
         }

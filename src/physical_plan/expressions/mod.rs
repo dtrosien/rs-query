@@ -1,8 +1,10 @@
+pub mod aggregate_expression;
 pub mod binary_expression;
 pub mod boolean_expression;
 pub mod cast_expression;
 pub mod column_expression;
 pub mod math_expression;
+pub mod sum_expression;
 
 use crate::datatypes::arrow_types::ArrowType;
 use crate::datatypes::column_vector::ColumnVector;
@@ -18,8 +20,8 @@ pub trait Expression: ToString {
 }
 
 pub trait Accumulator {
-    fn accumulate(value: Option<Arc<dyn Any>>);
-    fn final_value() -> Option<Arc<dyn Any>>;
+    fn accumulate(&mut self, value: Option<Arc<dyn Any>>);
+    fn final_value(&self) -> Option<Arc<dyn Any>>;
 }
 
 pub struct LiteralLongExpression {

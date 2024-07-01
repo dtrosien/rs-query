@@ -43,8 +43,8 @@ impl LogicalExpr for AggrExpr {
 }
 
 pub struct AggregationExprBase {
-    name: String,
-    expr: Arc<Expr>,
+    pub name: String,
+    pub expr: Arc<Expr>,
 }
 
 impl AggregationExprBase {
@@ -71,7 +71,7 @@ impl Display for AggregationExprBase {
 ////////////////////////////////////////////////////////////////////////////
 
 pub struct Max {
-    base: AggregationExprBase,
+    pub base: AggregationExprBase,
 }
 
 /// Convenience method to create a max reference
@@ -103,7 +103,7 @@ impl Display for Max {
 ////////////////////////////////////////////////////////////////////////////
 
 pub struct Min {
-    base: AggregationExprBase,
+    pub base: AggregationExprBase,
 }
 pub fn min(expr: Arc<Expr>) -> Arc<Expr> {
     Arc::from(Expr::Aggr(AggrExpr::Min(Min::new(expr))))
@@ -132,7 +132,7 @@ impl Display for Min {
 ////////////////////////////////////////////////////////////////////////////
 
 pub struct Sum {
-    base: AggregationExprBase,
+    pub base: AggregationExprBase,
 }
 
 pub fn sum(expr: Arc<Expr>) -> Arc<Expr> {
