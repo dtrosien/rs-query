@@ -6,7 +6,7 @@ An educational query engine project based on:
 
 ## To-Do List
 
-- [ ] implement aggregate Expressions
+- [ ] make accumulator type dynamic based on field in aggregate plan
 - [ ] use asserts for int tests
 - [ ] impl Optimizer
 - [ ] impl sql parser
