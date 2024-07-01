@@ -56,7 +56,7 @@ impl AggregationExprBase {
 impl LogicalExpr for AggregationExprBase {
     fn to_field(&self, input: Arc<dyn LogicalPlan>) -> anyhow::Result<Arc<Field>> {
         Ok(Arc::from(Field {
-            name: self.name.clone(),
+            name: format!("{}({})", self.name, self.expr), // todo check if always valid when not using just self.name
             data_type: self.expr.to_field(input)?.data_type.clone(),
         }))
     }
@@ -142,7 +142,7 @@ pub fn sum(expr: Arc<Expr>) -> Arc<Expr> {
 impl Sum {
     fn new(input: Arc<Expr>) -> Self {
         Self {
-            base: AggregationExprBase::new(format!("SUM({})", input), input),
+            base: AggregationExprBase::new("SUM".to_string(), input),
         }
     }
 }
