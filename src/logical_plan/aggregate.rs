@@ -53,9 +53,9 @@ impl Display for Aggregate {
 impl LogicalPlan for Aggregate {
     fn schema(&self) -> Arc<Schema> {
         let fields: Vec<Arc<Field>> = self
-            .aggregate_expr
+            .group_expr
             .iter()
-            .chain(self.group_expr.iter())
+            .chain(self.aggregate_expr.iter())
             .filter_map(|e| e.to_field(self.input.clone()).ok())
             .collect();
 

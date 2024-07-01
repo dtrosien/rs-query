@@ -70,8 +70,6 @@ impl PhysicalPlan for HashAggregateExec {
                     })
                     .collect();
 
-                println!("rowkey:{:?}", row_key.clone());
-
                 let accumulators = map.entry(row_key).or_insert_with(|| {
                     self.aggregate_expr
                         .iter()
@@ -126,8 +124,6 @@ impl PhysicalPlan for HashAggregateExec {
                     }
                 });
         });
-
-        println!("AGGREGATE HERE");
 
         let fields: Vec<Arc<dyn ColumnVector>> =
             builders.into_iter().map(|vec| vec.build()).collect();

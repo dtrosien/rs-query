@@ -4,6 +4,8 @@ pub mod boolean_expression;
 pub mod cast_expression;
 pub mod column_expression;
 pub mod math_expression;
+pub mod max_expression;
+pub mod min_expression;
 pub mod sum_expression;
 
 use crate::datatypes::arrow_types::ArrowType;

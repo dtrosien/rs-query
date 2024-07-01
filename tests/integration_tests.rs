@@ -1,6 +1,6 @@
 use rquery::datatypes::arrow_types::ArrowType;
 use rquery::execution::ExecutionContext;
-use rquery::logical_plan::expressions::aggr_expr::sum;
+use rquery::logical_plan::expressions::aggr_expr::{max, min, sum};
 use rquery::logical_plan::expressions::binary_expr::{and, or, BooleanBinaryExprExt};
 use rquery::logical_plan::expressions::literal_expr::{lit_double, lit_long, lit_str};
 use rquery::logical_plan::expressions::math_expr::MathExprExt;
@@ -135,9 +135,14 @@ fn test_math_from_csv() {
 fn test_aggregate_from_csv() {
     let ctx = ExecutionContext::new(HashMap::default());
 
-    let df = ctx
-        .csv("testdata/employee.csv", true)
-        .aggregate(vec![col("state")], vec![sum(col("salary"))]);
+    let df = ctx.csv("testdata/employee.csv", true).aggregate(
+        vec![col("state")],
+        vec![
+            sum(cast(col("salary"), ArrowType::Int64Type)),
+            max(cast(col("salary"), ArrowType::Int64Type)),
+            min(cast(col("salary"), ArrowType::Int64Type)),
+        ],
+    );
 
     println!("{}", df.clone().logical_plan().pretty());
 

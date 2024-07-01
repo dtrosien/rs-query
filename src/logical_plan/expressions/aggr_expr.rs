@@ -142,7 +142,7 @@ pub fn sum(expr: Arc<Expr>) -> Arc<Expr> {
 impl Sum {
     fn new(input: Arc<Expr>) -> Self {
         Self {
-            base: AggregationExprBase::new("SUM".to_string(), input),
+            base: AggregationExprBase::new(format!("SUM({})", input), input),
         }
     }
 }

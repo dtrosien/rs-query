@@ -20,6 +20,8 @@ use crate::physical_plan::expressions::column_expression::ColumnExpression;
 use crate::physical_plan::expressions::math_expression::{
     AddExpression, DivideExpression, ModulusExpression, MultiplyExpression, SubtractExpression,
 };
+use crate::physical_plan::expressions::max_expression::MaxExpression;
+use crate::physical_plan::expressions::min_expression::MinExpression;
 use crate::physical_plan::expressions::sum_expression::SumExpression;
 use crate::physical_plan::expressions::{
     Expression, LiteralDoubleExpression, LiteralFloatExpression, LiteralLongExpression,
@@ -84,36 +86,32 @@ impl QueryPlanner {
             let aggregate_expr: Vec<Arc<dyn AggregateExpression>> = aggregate
                 .aggregate_expr
                 .iter()
-                .map(|e| {
-                    match e.deref() {
-                        Expr::Aggr(AggrExpr::Sum(sum)) => Arc::new(SumExpression {
-                            expr: Self::create_physical_expr(
-                                sum.base.expr.clone(),
-                                aggregate.input.deref(),
-                            ),
-                        })
-                            as Arc<dyn AggregateExpression>,
+                .map(|e| match e.deref() {
+                    Expr::Aggr(AggrExpr::Sum(sum)) => Arc::new(SumExpression {
+                        expr: Self::create_physical_expr(
+                            sum.base.expr.clone(),
+                            aggregate.input.deref(),
+                        ),
+                    })
+                        as Arc<dyn AggregateExpression>,
 
-                        Expr::Aggr(AggrExpr::Max(max)) => Arc::new(SumExpression {
-                            // todo exchange with max
-                            expr: Self::create_physical_expr(
-                                max.base.expr.clone(),
-                                aggregate.input.deref(),
-                            ),
-                        })
-                            as Arc<dyn AggregateExpression>,
+                    Expr::Aggr(AggrExpr::Max(max)) => Arc::new(MaxExpression {
+                        expr: Self::create_physical_expr(
+                            max.base.expr.clone(),
+                            aggregate.input.deref(),
+                        ),
+                    })
+                        as Arc<dyn AggregateExpression>,
 
-                        Expr::Aggr(AggrExpr::Min(min)) => Arc::new(SumExpression {
-                            // todo exchange with min
-                            expr: Self::create_physical_expr(
-                                min.base.expr.clone(),
-                                aggregate.input.deref(),
-                            ),
-                        })
-                            as Arc<dyn AggregateExpression>,
+                    Expr::Aggr(AggrExpr::Min(min)) => Arc::new(MinExpression {
+                        expr: Self::create_physical_expr(
+                            min.base.expr.clone(),
+                            aggregate.input.deref(),
+                        ),
+                    })
+                        as Arc<dyn AggregateExpression>,
 
-                        _ => panic!("NOT SUPPORTED AGGREGATE"),
-                    }
+                    _ => panic!("NOT SUPPORTED AGGREGATE"),
                 })
                 .collect();
 
@@ -169,9 +167,6 @@ impl QueryPlanner {
                     BinaryExpr::LtEq(_) => Arc::new(LtEqExpression { l, r }),
                 }
             }
-            Expr::Unary(unary) => {
-                todo!()
-            }
             Expr::Math(math) => {
                 let l = Self::create_physical_expr(math.get_left().clone(), input);
                 let r = Self::create_physical_expr(math.get_right().clone(), input);
@@ -183,15 +178,13 @@ impl QueryPlanner {
                     MathExpr::Modulus(_) => Arc::new(ModulusExpression { l, r }),
                 }
             }
-            Expr::Aggr(aggr) => {
-                todo!()
-            }
             Expr::Alias(alias) => {
                 // note that there is no physical expression for an alias since the alias
                 // only affects the name using in the planning phase and not how the aliased
                 // expression is executed
                 Self::create_physical_expr(alias.expr.clone(), input)
             }
+            _ => panic!("not supported physical expression"),
         }
     }
 }
