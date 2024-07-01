@@ -94,8 +94,7 @@ impl PhysicalPlan for HashAggregateExec {
             builders.push(vector);
         });
 
-        map.iter().enumerate().for_each(|(index, entry)| {
-            let row_index = index;
+        map.iter().for_each(|entry| {
             let grouping_key = entry.0;
             let accumulators = entry.1;
 
