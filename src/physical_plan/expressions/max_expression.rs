@@ -11,7 +11,7 @@ pub struct MaxExpression {
 
 impl Display for MaxExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "MIN({})", self.expr.to_string())
+        write!(f, "MAX({})", self.expr.to_string())
     }
 }
 
