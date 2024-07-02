@@ -188,3 +188,60 @@ impl QueryPlanner {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::datatypes::arrow_types::ArrowType;
+    use crate::datatypes::schema::{Field, Schema};
+    use crate::execution::ExecutionContext;
+    use crate::logical_plan::expressions::aggr_expr::max;
+    use crate::logical_plan::expressions::col;
+    use crate::logical_plan::LogicalPlanPrinter;
+    use crate::optimizer::Optimizer;
+    use crate::physical_plan::PhysicalPlanPrinter;
+    use crate::query_planner::QueryPlanner;
+    use std::collections::HashMap;
+    use std::ops::Deref;
+    use std::sync::Arc;
+
+    #[test]
+    fn projection_push_down() {
+        let schema = Schema {
+            fields: vec![
+                Arc::from(Field {
+                    name: "passenger_count".to_string(),
+                    data_type: ArrowType::UInt32Type,
+                }),
+                Arc::from(Field {
+                    name: "max_fare".to_string(),
+                    data_type: ArrowType::DoubleType,
+                }),
+            ],
+        };
+
+        let ctx = ExecutionContext::new(HashMap::default());
+
+        let df = ctx.in_memory(Arc::from(schema), vec![]);
+
+        let plan = df
+            .aggregate(vec![col("passenger_count")], vec![max(col("max_fare"))])
+            .logical_plan();
+
+        let optimized_plan = Optimizer::optimize(plan.clone());
+
+        let physical_plan = QueryPlanner::create_physical_plan(optimized_plan.deref());
+
+        assert_eq!(
+            "Aggregate: group_expr=passenger_count, aggregate_expr=MAX(max_fare)\n\t\
+        Scan: in_memory; projection=None\n",
+            plan.pretty()
+        );
+        assert_eq!(
+            "Aggregate: group_expr=passenger_count, aggregate_expr=MAX(max_fare)\n\t\
+        Scan: in_memory; projection=[\"max_fare\", \"passenger_count\"]\n",
+            optimized_plan.pretty()
+        );
+        assert_eq!("HashAggregateExec: groupExpr=1, aggrExpr=MAX(0)\n\t\
+        ScanExec: schema=[passenger_count: UInt32Type, max_fare: DoubleType], projection=[\"max_fare\", \"passenger_count\"]\n", physical_plan.pretty());
+    }
+}
