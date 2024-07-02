@@ -7,7 +7,7 @@ use std::sync::Arc;
 
 /// Represents a scan of a data source
 pub struct Scan {
-    path: String,
+    pub path: String,
     pub datasource: Arc<Source>,
     pub projection: Vec<String>,
     schema: Arc<Schema>,

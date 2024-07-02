@@ -122,7 +122,7 @@ impl QueryPlanner {
                 schema: aggregate.schema(),
             });
         } else {
-            panic!("not supported physical plan")
+            panic!("not supported physical plan: {}", plan.to_string())
         }
     }
 

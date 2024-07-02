@@ -145,7 +145,6 @@ fn aggregate_from_csv() {
 
     let batch = ctx.execute(df).next().unwrap();
     assert_eq!("CO,21500,3,10000\n", batch.to_csv().unwrap());
-
 }
 
 #[test]
@@ -164,15 +163,15 @@ fn multi_plan_query_from_csv() {
             ],
         );
 
-    println!("{}", df.clone().logical_plan().pretty());
-
-    println!(
-        "{}",
-        QueryPlanner::create_physical_plan(df.clone().logical_plan().deref()).pretty()
-    );
+    // println!("{}", df.clone().logical_plan().pretty());
+    //
+    // println!(
+    //     "{}",
+    //     QueryPlanner::create_physical_plan(df.clone().logical_plan().deref()).pretty()
+    // );
 
     let batch = ctx.execute(df).next().unwrap();
 
     assert_eq!("CO,21500,10000\n", batch.to_csv().unwrap());
-    println!("{}", batch.show().unwrap());
+    //println!("{}", batch.show().unwrap());
 }
