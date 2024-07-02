@@ -4,6 +4,7 @@ use crate::datatypes::schema::Schema;
 use crate::logical_plan::data_frame::{DataFrame, DataFrameImpl};
 use crate::logical_plan::scan::Scan;
 use crate::logical_plan::LogicalPlan;
+use crate::optimizer::Optimizer;
 use crate::query_planner::QueryPlanner;
 use std::collections::HashMap;
 use std::ops::Deref;
@@ -84,12 +85,21 @@ impl ExecutionContext {
     }
 
     /// Execute the logical plan represented by a DataFrame
-    pub fn execute(&self, df: Arc<dyn DataFrame>) -> Box<dyn Iterator<Item = RecordBatch> + '_> {
-        self.execute_logical_plan(df.logical_plan().deref())
+    pub fn execute(
+        &self,
+        df: Arc<dyn DataFrame>,
+        optimize: bool,
+    ) -> Box<dyn Iterator<Item = RecordBatch> + '_> {
+        let plan = if optimize {
+            Optimizer::optimize(df.logical_plan())
+        } else {
+            df.logical_plan()
+        };
+        self.execute_logical_plan(plan.deref())
     }
 
     /// Execute the provided logical plan
-    fn execute_logical_plan(
+    pub fn execute_logical_plan(
         &self,
         plan: &dyn LogicalPlan,
     ) -> Box<dyn Iterator<Item = RecordBatch> + '_> {

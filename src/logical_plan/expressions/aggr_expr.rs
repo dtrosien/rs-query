@@ -162,7 +162,7 @@ impl Display for Sum {
 ////////////////////////////////////////////////////////////////////////////
 
 pub struct Avg {
-    base: AggregationExprBase,
+    pub base: AggregationExprBase,
 }
 
 pub fn avg(expr: Arc<Expr>) -> Arc<Expr> {
@@ -191,7 +191,7 @@ impl Display for Avg {
 ////////////////////////////////////////////////////////////////////////////
 
 pub struct Count {
-    base: AggregationExprBase,
+    pub base: AggregationExprBase,
 }
 
 pub fn count(expr: Arc<Expr>) -> Arc<Expr> {
@@ -224,7 +224,7 @@ impl Display for Count {
 ////////////////////////////////////////////////////////////////////////////
 
 pub struct CountDistinct {
-    base: AggregationExprBase,
+    pub base: AggregationExprBase,
 }
 
 pub fn count_distinct(expr: Arc<Expr>) -> Arc<Expr> {

@@ -1,5 +1,4 @@
 use crate::datatypes::arrow_field_vector::ArrowArrayFactory;
-use crate::datatypes::arrow_types::ArrowType;
 use crate::datatypes::arrow_vector_builder::ArrowVectorBuilder;
 use crate::datatypes::column_vector::ColumnVector;
 use crate::datatypes::record_batch::RecordBatch;
@@ -44,7 +43,7 @@ impl PhysicalPlan for HashAggregateExec {
     }
 
     fn execute(&self) -> Box<dyn Iterator<Item = RecordBatch> + '_> {
-        // todo use impl Hash or Eq instead of just string
+        // todo use impl Hash or Eq instead of just string and keep order in accumulator map
         let mut map: HashMap<Vec<Option<String>>, Vec<Arc<Mutex<dyn Accumulator>>>> =
             HashMap::new();
 
@@ -63,7 +62,7 @@ impl PhysicalPlan for HashAggregateExec {
                     .iter()
                     .map(|k| {
                         if let (Some(v), t) = (k.get_value(row_index), k.get_type()) {
-                            RecordBatch::value_to_string(v, &t) // todo use impl Hash or Eq instead of just string
+                            RecordBatch::value_to_string(v, &t)
                         } else {
                             None
                         }

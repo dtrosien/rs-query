@@ -63,22 +63,60 @@ impl ProjectionPushDownRule {
                 .map(|f| f.name.clone())
                 .collect();
 
-            let push_down: HashSet<String> = valid_field_names
+            let push_down_set: HashSet<String> = valid_field_names
                 .iter()
                 .filter(|s| column_names.contains(*s))
                 .cloned()
                 .collect();
 
-            Scan::new(
-                &scan.path,
-                scan.datasource.clone(),
-                push_down.into_iter().collect(),
-            )
+            let mut push_down_vec: Vec<String> = push_down_set.into_iter().collect();
+            push_down_vec.sort();
+
+            Scan::new(&scan.path, scan.datasource.clone(), push_down_vec)
         } else {
             panic!(
                 "ProjectionPushDownRule does not support plan: {}",
                 plan.to_string()
             )
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::datatypes::arrow_types::ArrowType;
+    use crate::execution::ExecutionContext;
+    use crate::logical_plan::expressions::aggr_expr::{min, sum};
+    use crate::logical_plan::expressions::binary_expr::BooleanBinaryExprExt;
+    use crate::logical_plan::expressions::literal_expr::lit_str;
+    use crate::logical_plan::expressions::{cast, col};
+    use crate::logical_plan::LogicalPlanPrinter;
+    use crate::optimizer::Optimizer;
+    use std::collections::HashMap;
+
+    #[test]
+    fn projection_push_down() {
+        let ctx = ExecutionContext::new(HashMap::default());
+
+        let df = ctx
+            .csv("testdata/employee.csv", true)
+            .filter(col("state").eq(lit_str("CO")))
+            .aggregate(
+                vec![col("state")],
+                vec![
+                    sum(cast(col("salary"), ArrowType::DoubleType)),
+                    min(cast(col("salary"), ArrowType::Int64Type)),
+                ],
+            );
+
+        let plan = df.logical_plan();
+
+        let optimized_plan = Optimizer::optimize(plan);
+
+        let expected_plan = "Aggregate: group_expr=state, aggregate_expr=SUM(CAST(salary AS DoubleType)), MIN(CAST(salary AS Int64Type))\n\
+        \tSelection: state = CO\n\
+        \t\tScan: testdata/employee.csv; projection=[\"salary\", \"state\"]\n";
+
+        assert_eq!(expected_plan, optimized_plan.pretty())
     }
 }
