@@ -8,8 +8,8 @@ use std::fmt::Display;
 use std::sync::Arc;
 
 pub struct RecordBatch {
-    pub(crate) schema: Arc<Schema>,
-    pub(crate) fields: Vec<Arc<dyn ColumnVector>>,
+    pub schema: Arc<Schema>,
+    pub fields: Vec<Arc<dyn ColumnVector>>,
 }
 
 impl RecordBatch {
@@ -25,14 +25,9 @@ impl RecordBatch {
         self.fields[i].clone()
     }
 
+    /// prints without headers for testing purposes
     pub fn to_csv(&self) -> Option<String> {
         let mut csv = String::new();
-        let mut headers = Vec::new();
-        for i in 0..self.column_count() {
-            headers.push(self.schema.fields[i].name.clone());
-        }
-        csv.push_str(&headers.join(","));
-        csv.push_str("\n");
         for i in 0..self.row_count() {
             let mut row = Vec::new();
             for j in 0..self.column_count() {
@@ -104,6 +99,7 @@ impl RecordBatch {
         }
     }
 
+    /// prints formated with headers
     pub fn show(&self) -> Option<String> {
         let mut csv = String::new();
         let mut headers = Vec::new();

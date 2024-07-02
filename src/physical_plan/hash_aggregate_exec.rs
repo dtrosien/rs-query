@@ -73,7 +73,10 @@ impl PhysicalPlan for HashAggregateExec {
                 let accumulators = map.entry(row_key).or_insert_with(|| {
                     self.aggregate_expr
                         .iter()
-                        .map(|a| a.create_accumulator(ArrowType::Int64Type)) // todo !!! get arrowtype from field !!!!
+                        .enumerate()
+                        .map(|(index, a)| {
+                            a.create_accumulator(aggr_input_values.get(index).unwrap().get_type())
+                        })
                         .collect()
                 });
 
