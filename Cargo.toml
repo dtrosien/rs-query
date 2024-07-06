@@ -1,5 +1,5 @@
 [package]
-name = "rquery"
+name = "rs-query"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,7 +10,7 @@ path = "src/lib.rs"
 
 # can be removed if only lib crate. Integration testing is done in test directory not in main
 [[bin]] # bin to run HelloWorld
-name = "rquery"
+name = "rs_query"
 path = "src/main.rs"
 
 
@@ -20,3 +20,4 @@ config = "0.14.0"
 tracing = { version = "0.1", features = ["log"] }
 csv = "1.3.0"
 anyhow = "1.0.86"
+sqlparser = "0.47.0"
